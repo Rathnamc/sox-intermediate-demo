@@ -1,0 +1,16 @@
+{
+  "name": "sox-intermediate-demo",
+  "version": "1.0.0",
+  "description": "Multiplayer WebSocket demo backend mirroring the SOX Intermediate architecture (Azure App Service, Linux, WebSockets)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  }
+}

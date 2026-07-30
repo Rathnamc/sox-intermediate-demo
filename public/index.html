@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SOX Intermediate — WebSocket Demo</title>
+<style>
+  :root {
+    --ink: #1c2733;
+    --paper: #eef2f5;
+    --card: #ffffff;
+    --accent: #0a5c8a;
+    --accent-2: #d97b2b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .app {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(28,39,51,.12);
+    padding: 1.5rem;
+  }
+  h1 { font-size: 1.15rem; margin: 0 0 .25rem; letter-spacing: .02em; }
+  .status { font-size: .8rem; color: #667; margin-bottom: 1rem; }
+  .status.live::before { content: "● "; color: #2a9d4a; }
+  .status.dead::before { content: "● "; color: #c0392b; }
+  .row { display: flex; gap: .5rem; margin-bottom: 1rem; }
+  input {
+    flex: 1; padding: .55rem .7rem; border: 1px solid #cdd6de;
+    border-radius: 6px; font: inherit;
+  }
+  button {
+    padding: .55rem 1rem; border: 0; border-radius: 6px;
+    background: var(--accent); color: #fff; font: inherit; cursor: pointer;
+  }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
+  .tap {
+    width: 100%; padding: 1rem; font-size: 1.05rem; font-weight: 600;
+    background: var(--accent-2); margin-bottom: 1.25rem;
+  }
+  .tap:active { transform: scale(.98); }
+  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: #667; margin: 0 0 .5rem; }
+  ol { margin: 0; padding-left: 1.4rem; }
+  li { padding: .2rem 0; font-variant-numeric: tabular-nums; }
+  .round { float: right; font-size: .8rem; color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>SOX Intermediate — Multiplayer Demo <span class="round" id="round"></span></h1>
+  <div class="status dead" id="status">Connecting…</div>
+
+  <div class="row">
+    <input id="name" placeholder="Your name" maxlength="24" />
+    <button id="setName">Set name</button>
+  </div>
+
+  <button class="tap" id="tap">Tap to score</button>
+
+  <h2>Live scoreboard</h2>
+  <ol id="board"></ol>
+</div>
+
+<script>
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${proto}://${location.host}`);
+  const $ = id => document.getElementById(id);
+
+  ws.onopen = () => { $('status').textContent = 'Connected'; $('status').className = 'status live'; };
+  ws.onclose = () => { $('status').textContent = 'Disconnected — refresh to rejoin'; $('status').className = 'status dead'; };
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'welcome') $('name').value = msg.you;
+    if (msg.type === 'state') {
+      $('round').textContent = 'Round ' + msg.round;
+      $('board').innerHTML = msg.scoreboard
+        .map(p => `<li>${p.name.replace(/</g,'&lt;')} — ${p.score}</li>`).join('');
+    }
+  };
+
+  $('tap').onclick = () => ws.send(JSON.stringify({ type: 'tap' }));
+  $('setName').onclick = () => ws.send(JSON.stringify({ type: 'setName', name: $('name').value }));
+</script>
+</body>
+</html>
