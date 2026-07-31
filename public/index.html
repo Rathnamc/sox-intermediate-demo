@@ -3,81 +3,121 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AZ-400 Exam Trainer</title>
+<title>Cert Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@700;900&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#0b1220;--card:#111a2e;--edge:#22304d;--ink:#e8edf7;--dim:#8b98b5;
---blue:#38a3f5;--good:#2fd08f;--warn:#f2b544;--bad:#ff5d73}
+:root{--bg:#070b14;--card:#0e1626cc;--edge:#1f2c47;--ink:#eef2fb;--dim:#8a97b6;
+--good:#2fd08f;--warn:#f2b544;--bad:#ff5d73;--az:#38a3f5;--aws:#ff9a3c;--ac:var(--az)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--ink);
-min-height:100vh;display:flex;justify-content:center;padding:24px}
-.wrap{width:100%;max-width:680px}
-.eyebrow{font-size:.7rem;letter-spacing:.3em;color:var(--blue);font-weight:700;margin:12px 0 8px}
-h1{font-size:2rem;letter-spacing:-.02em}
-h1 span{color:var(--dim);font-weight:500}
-.sub{color:var(--dim);font-size:.85rem;margin:8px 0 24px;line-height:1.5}
-.card{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:18px}
-button{font:inherit;cursor:pointer;border:0;border-radius:12px;color:var(--ink)}
-.primary{width:100%;background:var(--blue);color:#04121f;font-weight:700;font-size:1.05rem;padding:15px;margin-bottom:26px}
-.primary:disabled{background:#1c2740;color:#526287}
-.ghost{background:#1c2740;padding:13px;font-weight:600}
-.hist{display:flex;justify-content:space-between;align-items:center;background:var(--card);
-border:1px solid var(--edge);border-radius:10px;padding:11px 15px;margin-bottom:8px;font-size:.9rem}
+body{font-family:"Space Grotesk",system-ui,sans-serif;color:var(--ink);min-height:100vh;
+display:flex;justify-content:center;padding:24px;background:var(--bg);position:relative;overflow-x:hidden}
+body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(110px);opacity:.28;pointer-events:none;z-index:0}
+body::before{width:520px;height:520px;background:var(--az);top:-180px;left:-140px}
+body::after{width:460px;height:460px;background:var(--aws);bottom:-190px;right:-130px}
+.wrap{width:100%;max-width:700px;position:relative;z-index:1}
+.eyebrow{font-size:.68rem;letter-spacing:.34em;color:var(--ac);font-weight:700;margin:10px 0 10px}
+h1{font-family:"Unbounded",sans-serif;font-size:clamp(1.7rem,5vw,2.4rem);font-weight:900;letter-spacing:-.01em;line-height:1.1}
+.sub{color:var(--dim);font-size:.85rem;margin:10px 0 26px;line-height:1.55}
+.card{background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--edge);border-radius:18px;padding:20px}
+button{font:inherit;cursor:pointer;border:0;border-radius:13px;color:var(--ink);transition:transform .07s,filter .15s}
+button:active{transform:translateY(1px)}
+.primary{width:100%;background:var(--ac);color:#04121f;font-weight:700;font-size:1.02rem;padding:15px}
+.primary:hover{filter:brightness(1.1)}
+.primary:disabled{background:#1a2540;color:#4d5f88}
+.ghost{background:#16203a;border:1px solid var(--edge);padding:13px;font-weight:600}
+.certcard{display:block;width:100%;text-align:left;background:var(--card);backdrop-filter:blur(14px);
+border:1px solid var(--edge);border-radius:18px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.certcard::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--cc)}
+.certcard:hover{border-color:var(--cc)}
+.certcard .code{font-family:"Unbounded",sans-serif;font-weight:900;font-size:1.3rem;color:var(--cc)}
+.certcard .nm{font-weight:600;margin:2px 0 6px}
+.certcard .st{font-size:.8rem;color:var(--dim)}
+.certcard .resume{display:inline-block;margin-top:10px;font-size:.78rem;font-weight:700;color:var(--cc);
+border:1px solid var(--cc);border-radius:99px;padding:3px 12px}
+.hist{display:flex;justify-content:space-between;align-items:center;background:var(--card);backdrop-filter:blur(14px);
+border:1px solid var(--edge);border-radius:12px;padding:11px 15px;margin-bottom:8px;font-size:.88rem}
 .hist .dt{color:var(--dim)}
 .pass{color:var(--good);font-weight:700}.fail{color:var(--bad);font-weight:700}
-.mini{font-size:.7rem;color:var(--dim);font-weight:400;margin-left:4px}
-.sect{font-size:.7rem;letter-spacing:.2em;color:var(--dim);font-weight:700;margin:22px 0 10px}
-.banner{border-radius:12px;border:1px solid;padding:14px;margin-bottom:18px;font-size:.9rem;line-height:1.5}
-.b-good{border-color:#1d6b4c;background:#0d2b20}.b-warn{border-color:#7a5c1e;background:#2b230d}.b-bad{border-color:#7a2634;background:#2b0d14}
-.reset{background:none;color:var(--dim);font-size:.75rem;text-decoration:underline;margin-top:10px}
+.mini{font-size:.68rem;color:var(--dim);font-weight:400;margin-left:4px}
+.sect{font-size:.68rem;letter-spacing:.22em;color:var(--dim);font-weight:700;margin:24px 0 10px}
+.banner{border-radius:14px;border:1px solid;padding:14px 16px;margin-bottom:16px;font-size:.88rem;line-height:1.55;background:var(--card);backdrop-filter:blur(14px)}
+.b-good{border-color:#1d6b4c}.b-warn{border-color:#7a5c1e}.b-bad{border-color:#7a2634}
+.reset{background:none;border:none;color:var(--dim);font-size:.74rem;text-decoration:underline;margin-top:10px}
 .reset:hover{color:var(--bad)}
-/* exam */
-.meta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);margin:8px 0}
-.pill{padding:2px 9px;border-radius:99px;background:#1c2740;margin-left:6px}
-.pill.e{background:#0d2b20;color:var(--good)}.pill.m{background:#2b230d;color:var(--warn)}.pill.h{background:#2b0d14;color:var(--bad)}
-.bar{height:4px;background:#1c2740;border-radius:99px;margin-bottom:20px}
-.bar i{display:block;height:4px;background:var(--blue);border-radius:99px}
-.q{font-size:1.08rem;font-weight:600;line-height:1.5;margin-bottom:6px}
-.multi-note{color:var(--blue);font-size:.8rem;margin-bottom:10px}
-.opt{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--edge);
-border-radius:11px;padding:13px 15px;margin-bottom:8px;font-size:.92rem;line-height:1.45;transition:border-color .12s}
-.opt:hover{border-color:#3a4c74}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:.74rem;color:var(--dim);margin:6px 0 10px}
+.pill{padding:2px 10px;border-radius:99px;background:#16203a;margin-left:6px}
+.pill.e{color:var(--good)}.pill.m{color:var(--warn)}.pill.h{color:var(--bad)}
+.bar{height:5px;background:#16203a;border-radius:99px;margin-bottom:20px;overflow:hidden}
+.bar i{display:block;height:5px;background:linear-gradient(90deg,var(--ac),#fff3);border-radius:99px;transition:width .3s}
+.q{font-size:1.07rem;font-weight:600;line-height:1.5;margin-bottom:6px}
+.multi-note{color:var(--ac);font-size:.8rem;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--edge);
+border-radius:12px;padding:13px 15px;margin-bottom:8px;font-size:.91rem;line-height:1.45}
+.opt:hover{border-color:#38507f}
 .opt .l{color:var(--dim);font-family:monospace;margin-right:8px}
-.opt.sel{border-color:var(--blue);background:#0e2138}
-.opt.right{border-color:var(--good);background:#0d2b20}
-.opt.wrong{border-color:var(--bad);background:#2b0d14}
-.opt.mute{opacity:.5}
-.explain{border-radius:12px;border:1px solid;padding:14px;margin-top:16px;font-size:.9rem;line-height:1.55}
+.opt.sel{border-color:var(--ac);background:#0d1f36}
+.opt.right{border-color:var(--good);background:#0c261c}
+.opt.wrong{border-color:var(--bad);background:#2a1018}
+.opt.mute{opacity:.45}
+.explain{border-radius:13px;border:1px solid;padding:14px 16px;margin-top:16px;font-size:.88rem;line-height:1.6;background:var(--card)}
 .explain b{display:block;margin-bottom:4px}
-/* results */
-.score-wrap{text-align:center;margin:30px 0 24px}
-.score{font-size:4.5rem;font-weight:700;line-height:1}
-.badge{display:inline-block;margin-top:10px;padding:4px 16px;border-radius:99px;font-weight:700;font-size:.85rem}
-.badge.p{background:#0d2b20;color:var(--good)}.badge.f{background:#2b0d14;color:var(--bad)}
+.exitrow{display:flex;justify-content:flex-end;margin-bottom:2px}
+.exit{background:none;border:none;color:var(--dim);font-size:.78rem;text-decoration:underline}
+.exit:hover{color:var(--ink)}
+.score-wrap{text-align:center;margin:26px 0 22px}
+.score{font-family:"Unbounded",sans-serif;font-size:4.2rem;font-weight:900;line-height:1}
+.badge{display:inline-block;margin-top:12px;padding:5px 18px;border-radius:99px;font-weight:700;font-size:.85rem;border:1px solid}
+.badge.p{border-color:var(--good);color:var(--good)}.badge.f{border-color:var(--bad);color:var(--bad)}
 .dom{margin-bottom:12px}
-.dom .row{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px}
-.dom .track{height:7px;background:#1c2740;border-radius:99px}
-.dom .fill{height:7px;border-radius:99px}
+.dom .row{display:flex;justify-content:space-between;font-size:.84rem;margin-bottom:4px}
+.dom .track{height:7px;background:#16203a;border-radius:99px}
+.dom .fill{height:7px;border-radius:99px;transition:width .5s}
 .two{display:flex;gap:10px;margin-top:22px}
 .two button{flex:1}
 .hide{display:none}
+.back{background:none;border:none;color:var(--dim);font-size:.8rem;margin-bottom:10px;text-decoration:underline}
+.modal{position:fixed;inset:0;background:#070b14ee;display:flex;align-items:center;justify-content:center;z-index:10;padding:24px}
+.modal .card{width:100%;max-width:420px}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--edge);background:#0a1120;color:var(--ink);font:inherit;margin:14px 0}
+.syncnote{font-size:.72rem;color:var(--dim);text-align:center;margin-top:14px}
+.syncnote.err{color:var(--warn)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+<div class="modal hide" id="nameModal">
+  <div class="card">
+    <div class="eyebrow">CERT TRAINER</div>
+    <h1 style="font-size:1.5rem">Who's studying?</h1>
+    <p class="sub" style="margin-bottom:0">Pick a profile name. Your scores and in-progress exams sync to the server under this name — use the same one on any device.</p>
+    <input id="nameInput" maxlength="30" placeholder="e.g. chris" autocomplete="off"/>
+    <button class="primary" id="nameGo">Let's go</button>
+  </div>
+</div>
+
 <div id="v-home">
-  <div class="eyebrow">EXAM TRAINER</div>
-  <h1>AZ-400 <span>DevOps Engineer Expert</span></h1>
-  <p class="sub">50 questions per attempt · Microsoft exam format · 700/1000 to pass · retakes mix questions you missed with ones you haven't seen. Scores save in this browser.</p>
-  <button class="primary" id="startBtn">Start exam</button>
-  <div id="homeVerdict"></div>
-  <div id="homeHist"></div>
+  <div class="eyebrow">CERT TRAINER</div>
+  <h1>Pick your exam.</h1>
+  <p class="sub">50 questions per attempt · real exam format · 700/1000 to pass · exit anytime and resume where you left off · retakes mix missed questions with fresh ones.</p>
+  <div id="certList"></div>
+  <div class="syncnote" id="syncNote"></div>
+</div>
+
+<div id="v-cert" class="hide">
+  <button class="back" id="backHome">← All certs</button>
+  <div class="eyebrow" id="cEyebrow"></div>
+  <h1 id="cTitle"></h1>
+  <p class="sub" id="cSub"></p>
+  <button class="primary" id="startBtn" style="margin-bottom:14px"></button>
+  <div id="cVerdict"></div>
+  <div id="cHist"></div>
 </div>
 
 <div id="v-exam" class="hide">
+  <div class="exitrow"><button class="exit" id="exitBtn">Save & exit</button></div>
   <div class="meta"><span id="qCount"></span><span><span class="pill" id="qDom"></span><span class="pill" id="qDiff"></span></span></div>
   <div class="bar"><i id="qBar" style="width:0%"></i></div>
   <div class="q" id="qText"></div>
@@ -100,13 +140,17 @@ border-radius:11px;padding:13px 15px;margin-bottom:8px;font-size:.92rem;line-hei
   <div id="dDomains"></div>
   <div class="two">
     <button class="primary" id="againBtn" style="margin:0">Take another exam</button>
-    <button class="ghost" id="homeBtn">Home</button>
+    <button class="ghost" id="doneHomeBtn">Back to cert</button>
   </div>
 </div>
 
 </div>
 <script>
-const BANK = [
+const CERTS = {
+  az400:{ code:"AZ-400", name:"Microsoft DevOps Engineer Expert", accent:"var(--az)",
+    sub:"Azure DevOps · GitHub · pipelines · GHAS · Azure Monitor.",
+    labels:{Processes:"Processes & communication","Source control":"Source control",Pipelines:"Build & release pipelines",Security:"Security & compliance",Instrumentation:"Instrumentation & monitoring"},
+    bank: [
 {id:"P01",d:"Processes",diff:1,q:"Your team wants work items to automatically move to 'Resolved' when a pull request that mentions them is merged. What should you use?",o:["A scheduled Logic App","Commit/PR keywords like 'Fixes #123' with work item transition settings","A manual board rule","Azure Monitor alerts"],a:1,x:"Azure DevOps and GitHub both support linking and transitioning work items via keywords (e.g., 'Fixes AB#123'). It's built-in — no automation infrastructure needed. The other options add complexity for something the platform already does."},
 {id:"P02",d:"Processes",diff:1,q:"You need a lightweight way for the team to document architecture decisions next to the code. What should you recommend?",o:["A SharePoint site","A project wiki or in-repo markdown docs","Email threads","A OneNote notebook"],a:1,x:"Keeping docs in a wiki or the repo itself keeps them versioned, reviewable through PRs, and close to the code. External stores drift out of date and aren't part of the engineering workflow."},
 {id:"P03",d:"Processes",diff:2,q:"Stakeholders complain they never know when a release goes out. What is the LEAST intrusive way to notify them automatically?",o:["Add them as approvers on the release stage","Configure service hooks / notifications to post to a Teams or Slack channel on deployment completion","Send a manual email after each release","Give them access to the pipeline logs"],a:1,x:"Service hooks push release events into the channels stakeholders already use, with zero manual effort and without inserting them into the approval flow. Making them approvers would block releases; manual email doesn't scale."},
@@ -196,71 +240,187 @@ const BANK = [
 {id:"I10",d:"Instrumentation",diff:1,q:"MTTR measures…",o:["Time between releases","Mean time to restore/recover service after a failure","Number of tests","Merge frequency"],a:1,x:"MTTR is a DORA stability metric: how fast you recover. Monitoring, alerting, and automated rollback are the levers that shrink it."},
 {id:"I11",d:"Instrumentation",diff:2,q:"You want error budgets and SLOs for a service. The SLO is 99.9% successful requests over 30 days. What is the error budget?",o:["0.1% of requests over the window","10% of requests","Zero failures allowed","One outage per year"],a:0,x:"Error budget = 1 − SLO. 0.1% failed requests over 30 days is the allowance; burning it faster than planned should slow releases and trigger reliability work."},
 {id:"I12",d:"Instrumentation",diff:3,q:"Distributed tracing shows most checkout latency inside a dependency call to an external payments API, not your code. What is the correct engineering response?",o:["Rewrite your app UI","Add resilience (timeouts, retries with backoff, circuit breaker), track the dependency's SLA, and surface a dependency-level alert","Remove tracing","Blame the network team without data"],a:1,x:"When latency is a dependency, you engineer around it (resilience patterns) and alert on it. Rewriting unrelated code wastes effort; removing observability hides the problem."}
-];
-const KEY="az400-trainer", SIZE=50, PASS=700;
-const LABEL={Processes:"Processes & communication","Source control":"Source control",Pipelines:"Build & release pipelines",Security:"Security & compliance",Instrumentation:"Instrumentation & monitoring"};
+] },
+  dop:{ code:"DOP-C02", name:"AWS DevOps Engineer Professional", accent:"var(--aws)",
+    sub:"CodePipeline · CloudFormation · resilience · CloudWatch · incident response · security.",
+    labels:{SDLC:"SDLC automation",IaC:"Config management & IaC",Resilient:"Resilient cloud solutions",Monitoring:"Monitoring & logging",Incident:"Incident & event response",Security:"Security & compliance"},
+    bank: [
+{id:"D01",d:"SDLC",diff:1,q:"Which AWS service natively runs build and test commands from a buildspec.yml file?",o:["CodeDeploy","CodeBuild","CloudTrail","Systems Manager"],a:1,x:"CodeBuild executes the phases in buildspec.yml (install, pre_build, build, post_build) on managed build containers. CodeDeploy handles deployment, not builds."},
+{id:"D02",d:"SDLC",diff:1,q:"A CodePipeline should start automatically when commits land on the main branch of a GitHub repo. What provides this trigger?",o:["A cron Lambda polling GitHub","CodeStar Connections (GitHub App) source integration with push events","Manual release button only","An S3 upload"],a:1,x:"The CodeStar Connections integration receives push events from GitHub and starts the pipeline — no polling infrastructure. Manual-only defeats CI."},
+{id:"D03",d:"SDLC",diff:2,q:"Deployments to an Auto Scaling group must shift traffic gradually and roll back automatically on CloudWatch alarm breach. Which CodeDeploy configuration supports this?",o:["In-place all-at-once","Blue/green with a canary or linear traffic-shifting config and alarm-based rollback","FTP copy","cron + rsync"],a:1,x:"CodeDeploy blue/green supports canary/linear shifting and automatic rollback wired to CloudWatch alarms. All-at-once has no gradual exposure and no safety net during rollout."},
+{id:"D04",d:"SDLC",diff:2,q:"Your Lambda-based app deploys through SAM/CodeDeploy. You want 10% of traffic on the new version for 10 minutes before full shift. Which deployment preference does this?",o:["AllAtOnce","Canary10Percent10Minutes","OnlyOnFridays","Linear100"],a:1,x:"Lambda traffic shifting via CodeDeploy supports named canary/linear configs; Canary10Percent10Minutes is exactly this pattern, with alarms able to abort and roll back."},
+{id:"D05",d:"SDLC",diff:2,q:"Build artifacts must be shared between pipeline stages. Where does CodePipeline store them by default?",o:["An S3 artifact bucket","EBS volumes","The runner's /tmp","DynamoDB"],a:0,x:"CodePipeline passes artifacts between stages via its S3 artifact store (optionally KMS-encrypted). Runner-local storage doesn't survive between actions."},
+{id:"D06",d:"SDLC",diff:3,q:"A monorepo triggers full pipelines for every commit, wasting money. Commits usually touch one service. What is the recommended optimization?",o:["Delete the repo","Trigger filtering (e.g., EventBridge rules / pipeline V2 trigger filters on paths) so only affected service pipelines run","Run pipelines hourly regardless","Disable CI"],a:1,x:"Path-based trigger filtering starts only the pipelines whose service changed. This is the AWS analog of path filters and the standard monorepo cost fix."},
+{id:"D07",d:"SDLC",diff:2,q:"Integration tests need a temporary, production-like environment per pull request, destroyed on merge. What is the DevOps-professional approach?",o:["A permanent shared staging box","Ephemeral environments created by IaC in the pipeline (e.g., CloudFormation stack per PR) and deleted on close","Testing in production only","Manual clickops per PR"],a:1,x:"Per-PR stacks from templates give isolated, disposable environments with cost bounded by lifetime. Shared staging causes test interference; clickops isn't repeatable."},
+{id:"D08",d:"SDLC",diff:1,q:"What does an appspec.yml file define?",o:["Build phases","How CodeDeploy deploys: files/traffic routing plus lifecycle hooks (BeforeInstall, AfterInstall, etc.)","IAM policies","VPC routes"],a:1,x:"appspec.yml is CodeDeploy's contract: what to copy where (EC2/on-prem) or which Lambda/ECS target, and the hook scripts to run at each lifecycle event. buildspec.yml is CodeBuild's file — a classic exam distinction."},
+{id:"D09",d:"SDLC",diff:2,q:"Your team wants trunk-based development but features take weeks. How do incomplete features ship safely?",o:["Long-lived feature branches merged quarterly","Feature flags (e.g., AppConfig) so merged code deploys dark","Commented-out code","Separate prod repo"],a:1,x:"Flags decouple deploy from release; AWS AppConfig provides managed flags with validators and gradual rollout. Long-lived branches reintroduce merge debt."},
+{id:"D10",d:"SDLC",diff:3,q:"An ECS blue/green deployment must run automated smoke tests against the green tasks BEFORE production traffic shifts. Which CodeDeploy feature enables this?",o:["It cannot be done","A test listener on the load balancer plus the AfterAllowTestTraffic lifecycle hook running validation (e.g., Lambda)","Manual SSH testing","Deploying twice"],a:1,x:"ECS blue/green supports a second (test) listener routing to green; the AfterAllowTestTraffic hook runs your validation and can fail the deployment before real traffic moves."},
+{id:"D11",d:"SDLC",diff:2,q:"Security requires every container image to be scanned for CVEs before it can be deployed. Which native combination fits?",o:["Hope","Amazon ECR scanning (basic/enhanced via Inspector) with a pipeline stage that blocks on findings","Only scan in production","Weekly emails"],a:1,x:"ECR integrates image scanning; pipelines query scan results and fail promotion on critical findings — shift-left for containers."},
+{id:"D12",d:"SDLC",diff:2,q:"CodeBuild needs npm packages from a private Artifactory requiring a token. Where should the token come from?",o:["Hardcoded in buildspec","Secrets Manager (or SSM SecureString) referenced by the build environment","A public S3 object","In the Docker image layers"],a:1,x:"CodeBuild pulls secrets at runtime from Secrets Manager/Parameter Store env references, keeping them out of source and images. Anything baked into repo or layers leaks."},
+{id:"D13",d:"SDLC",diff:3,q:"You must guarantee that only artifacts produced by the official pipeline can be deployed to production accounts. Which control set achieves this? (Choose two.)",o:["Cross-account IAM roles that only the pipeline can assume for prod deploys","Let developers deploy from laptops with admin keys","S3 artifact bucket policies restricting reads to the pipeline role","Email-based approvals only"],a:[0,2],multi:true,x:"Locking prod deploy permissions to the pipeline's role and restricting artifact access to that role enforces provenance by IAM, not policy documents nobody reads. Laptop admin keys are the exact anti-pattern."},
+{id:"D14",d:"SDLC",diff:1,q:"Which service provides managed Git repositories' successor guidance aside, the standard AWS pipeline orchestrator is…",o:["CodePipeline","Step Functions only","EventBridge only","AWS Config"],a:0,x:"CodePipeline is the release orchestrator connecting sources, builds, tests, approvals, and deploy providers. Step Functions can orchestrate workflows but CodePipeline is purpose-built for CD."},
+{id:"I01",d:"IaC",diff:1,q:"In CloudFormation, what happens by default when a stack update fails?",o:["Nothing","Automatic rollback to the previous working state","The stack is deleted","Resources keep half-updated"],a:1,x:"Failed updates trigger rollback to the last known good configuration by default — a core CloudFormation safety behavior."},
+{id:"I02",d:"IaC",diff:2,q:"You need to preview exactly which resources a CloudFormation update will add, modify, or delete before executing. What do you use?",o:["Guess from the diff","Change sets","CloudTrail","Drift detection after the fact"],a:1,x:"Change sets show the planned resource actions (like 'terraform plan') so you can catch destructive changes before execution."},
+{id:"I03",d:"IaC",diff:2,q:"Someone manually edited a security group that CloudFormation manages. Which feature identifies this divergence?",o:["Stack policies","Drift detection","cfn-lint","Rollback triggers"],a:1,x:"Drift detection compares actual resource state to the template's expected state and reports differences. Stack policies prevent updates; they don't detect out-of-band changes."},
+{id:"I04",d:"IaC",diff:2,q:"You must deploy the same baseline stack (logging, roles, Config rules) to every account in an AWS Organization, including future accounts automatically. What should you use?",o:["Manual per-account deploys","CloudFormation StackSets with service-managed permissions and auto-deployment to OUs","One giant stack in one account","Email instructions to account owners"],a:1,x:"StackSets with org integration push stacks across accounts/regions and auto-deploy to new accounts joining an OU — the standard multi-account baseline mechanism."},
+{id:"I05",d:"IaC",diff:1,q:"AWS CDK differs from raw CloudFormation templates in that it…",o:["Bypasses CloudFormation entirely","Lets you define infrastructure in programming languages, synthesizing to CloudFormation","Only works in one region","Is imperative at deploy time"],a:1,x:"CDK code synthesizes to CloudFormation templates, giving loops/abstractions/reuse while keeping CloudFormation's deployment engine underneath."},
+{id:"I06",d:"IaC",diff:2,q:"A critical RDS instance in a stack must never be accidentally deleted by a stack update or deletion. Which TWO protections apply? (Choose two.)",o:["DeletionPolicy: Retain (or Snapshot) on the resource","Stack termination protection","Naming it 'do-not-delete'","Removing it from monitoring"],a:[0,1],multi:true,x:"DeletionPolicy controls resource fate on removal/delete; termination protection blocks whole-stack deletion. Names protect nothing."},
+{id:"I07",d:"IaC",diff:3,q:"Your org requires that no IaC template creating public S3 buckets can ever be deployed. Where is the MOST reliable enforcement point?",o:["A wiki rule","Preventive controls: CloudFormation Guard/policy-as-code checks in the pipeline PLUS SCPs or S3 account-level Block Public Access as backstop","Quarterly manual review","Trusting reviewers"],a:1,x:"Pipeline policy-as-code catches it pre-deploy; SCP/account-level BPA guarantees it even outside the pipeline. Defense in depth beats process documents."},
+{id:"I08",d:"IaC",diff:2,q:"Configuration of EC2 fleet software (packages, files, services) at scale, with drift remediation, is the job of…",o:["Manual SSH","Systems Manager State Manager (associations) / Ansible-style config management","CloudFront","Route 53"],a:1,x:"State Manager associations apply and re-apply desired configuration on schedules, correcting drift — config management without logging into boxes."},
+{id:"I09",d:"IaC",diff:2,q:"Golden AMIs must be built, tested, and distributed to multiple accounts on a schedule. Which service is purpose-built for this?",o:["EC2 Image Builder","CloudShell","Amazon Lightsail","AWS Batch"],a:0,x:"Image Builder automates AMI/container image pipelines: build, test, distribute cross-account/region on schedules — the golden-image factory."},
+{id:"I10",d:"IaC",diff:3,q:"A CloudFormation custom resource backed by Lambda hangs during stack delete, blocking the stack for an hour. What design flaw most likely caused it?",o:["Too many tags","The Lambda failed to send a response to the pre-signed callback URL on failure paths","The template was YAML","Stack name too long"],a:1,x:"Custom resources must ALWAYS respond (success or failure) to the callback URL, including in error/timeout paths, or CloudFormation waits until timeout. Robust custom resources wrap logic to guarantee a response (cfn-response / crhelper)."},
+{id:"I11",d:"IaC",diff:1,q:"Which statement about parameters vs. hardcoded values in templates is TRUE for multi-environment reuse?",o:["Hardcode everything","Parameters/mappings/SSM references let one template serve dev/stage/prod safely","Copy the template per environment and edit by hand","Environments should share one mutable stack"],a:1,x:"Parameterized templates (often resolving values from SSM) keep one reviewed artifact serving all environments — copies drift immediately."},
+{id:"R01",d:"Resilient",diff:1,q:"An application must survive the loss of an entire Availability Zone with no manual action. What is the baseline architecture?",o:["Single large instance","Multi-AZ: instances in an Auto Scaling group across AZs behind a load balancer, Multi-AZ data tier","Two instances in one AZ","Daily backups only"],a:1,x:"AZ-resilience means redundancy across AZs at every tier: ASG spanning AZs, ELB routing around failure, Multi-AZ RDS/Aurora. Backups address durability, not availability."},
+{id:"R02",d:"Resilient",diff:2,q:"RTO of 15 minutes and RPO of near-zero across REGIONS for an RDS-backed app. Which strategy fits at reasonable cost?",o:["Backup & restore from S3","Warm standby: cross-region read replica (or Aurora Global Database) with scaled-down app capacity ready to scale up","Rebuild from scratch after failure","Multi-site active-active for a simple internal app"],a:1,x:"Warm standby meets minutes-level RTO and near-zero RPO via continuous replication. Backup/restore blows the RTO; active-active exceeds the requirement and cost."},
+{id:"R03",d:"Resilient",diff:2,q:"Route 53 must stop sending users to a regional endpoint that starts failing. What do you configure?",o:["A lower TTL only","Health checks attached to failover (or latency/weighted) routing records","MX records","Geolocation with no checks"],a:1,x:"Route 53 health checks mark endpoints unhealthy and routing policies (failover/weighted/latency) exclude them. TTL affects propagation speed but doesn't detect failure."},
+{id:"R04",d:"Resilient",diff:2,q:"A processing tier reads from SQS. Messages that repeatedly fail should not poison the queue. What is the standard pattern?",o:["Delete failures silently","A dead-letter queue with maxReceiveCount, plus alarms on DLQ depth","Infinite retries","Bigger messages"],a:1,x:"Redrive policy moves messages exceeding maxReceiveCount to a DLQ for inspection; alarming on DLQ depth surfaces systemic failures. Infinite retries burn compute and block progress."},
+{id:"R05",d:"Resilient",diff:3,q:"During AZ impairment, your ASG scales up in healthy AZs but new instances take 8 minutes to warm, causing brownout. Which TWO mitigations help? (Choose two.)",o:["Warm pools / higher baseline capacity to absorb AZ loss","Longer health check grace only","Pre-scaling via scheduled/predictive scaling ahead of load","Removing the load balancer"],a:[0,2],multi:true,x:"Warm pools and static stability (running enough capacity that losing an AZ doesn't require scrambling) plus predictive scaling reduce dependence on slow reactive scale-out during failures."},
+{id:"R06",d:"Resilient",diff:2,q:"Which service lets you inject controlled faults (e.g., API throttling, instance termination) to verify resilience assumptions?",o:["AWS Fault Injection Service (FIS)","CloudFormation","Cost Explorer","IAM Access Analyzer"],a:0,x:"FIS runs chaos-engineering experiments with guardrails (stop conditions on alarms) — testing that your recovery automation actually works."},
+{id:"R07",d:"Resilient",diff:1,q:"Aurora improves recovery over standard MySQL on EC2 primarily because…",o:["It's cheaper always","Storage is replicated 6 ways across 3 AZs with fast failover to replicas","It skips backups","It runs on one big box"],a:1,x:"Aurora's distributed storage layer and promotion of replicas give typically sub-minute failover and strong durability without manual intervention."},
+{id:"R08",d:"Resilient",diff:3,q:"A multi-region active-passive app fails over via Route 53. A dependency: the standby region's Lambda functions read config from a DynamoDB table only in the primary region. What is the flaw and fix?",o:["No flaw","Cross-region hard dependency defeats failover — use DynamoDB global tables (or replicated config) so the standby is self-contained","Lambda cannot run in two regions","Route 53 fixes it automatically"],a:1,x:"DR regions must be independently functional; any synchronous dependency on the primary region fails with it. Global tables replicate the data so failover actually works."},
+{id:"R09",d:"Resilient",diff:2,q:"ECS services should replace unhealthy tasks automatically. What drives this?",o:["Manual restarts","Container/ELB health checks — ECS stops failing tasks and the scheduler launches replacements to meet desired count","A nightly reboot cron","SSH scripts"],a:1,x:"The ECS scheduler reconciles desired vs. running healthy tasks continuously, using health check signals — self-healing by design."},
+{id:"M01",d:"Monitoring",diff:1,q:"Application logs from EC2 and containers should be centralized and searchable. What is the standard first destination?",o:["Local disk","CloudWatch Logs via the CloudWatch agent / awslogs driver","A USB drive","Email"],a:1,x:"CloudWatch Logs centralizes streams with retention, metric filters, subscriptions, and Logs Insights querying. Local disk dies with the instance."},
+{id:"M02",d:"Monitoring",diff:2,q:"You need an alarm when application error log lines exceed 50 in 5 minutes. Which mechanism converts log content into an alarmable signal?",o:["Reading logs manually","A metric filter on the log group publishing a custom metric, with a CloudWatch alarm on it","S3 lifecycle rules","A dashboard alone"],a:1,x:"Metric filters turn matching log events into metrics; alarms then act on thresholds. Dashboards visualize but don't notify."},
+{id:"M03",d:"Monitoring",diff:2,q:"Which service traces individual requests across microservices to find where latency accumulates?",o:["AWS X-Ray","AWS Config","Trusted Advisor","Amazon Inspector"],a:0,x:"X-Ray provides distributed tracing with service maps and per-segment timing — the request-level 'where did the time go' tool."},
+{id:"M04",d:"Monitoring",diff:2,q:"Ops wants near-real-time processing of specific log events (e.g., forwarding security events to a SIEM). Which feature streams matching events out of CloudWatch Logs?",o:["Log group tags","Subscription filters to Kinesis/Firehose/Lambda","Manual export monthly","Retention settings"],a:1,x:"Subscription filters push matching log events to Kinesis Data Streams, Firehose, or Lambda for real-time pipelines. Export tasks are batch, not real-time."},
+{id:"M05",d:"Monitoring",diff:3,q:"An alarm should fire only when BOTH high latency AND elevated 5xx occur, to cut noise. What implements this natively?",o:["Two separate alarms emailed together","A composite alarm combining the two alarm states with AND logic","A spreadsheet","Longer evaluation periods only"],a:1,x:"Composite alarms evaluate boolean combinations of child alarm states, firing once on the combined condition — purpose-built alert-noise reduction."},
+{id:"M06",d:"Monitoring",diff:1,q:"CloudWatch metrics at 1-second granularity for a custom application metric require…",o:["Nothing special","Publishing as high-resolution custom metrics","Enabling detailed monitoring on EC2","X-Ray"],a:1,x:"Standard resolution is 1 minute; high-resolution custom metrics support 1-second granularity (and high-resolution alarms). EC2 detailed monitoring is 1-minute, a separate concept."},
+{id:"M07",d:"Monitoring",diff:2,q:"Which query service analyzes CloudWatch Logs with a purpose-built query language for ad-hoc investigation?",o:["Logs Insights","Athena only","QuickSight only","RDS Performance Insights"],a:0,x:"CloudWatch Logs Insights runs fast queries (filter/stats/parse) over log groups — the go-to for incident log analysis."},
+{id:"M08",d:"Monitoring",diff:2,q:"Business wants a single pane showing key metrics across ALL production accounts. What enables this?",o:["Logging into 12 consoles","CloudWatch cross-account observability (monitoring account linking source accounts)","Screenshots in Teams","Email digests"],a:1,x:"Cross-account observability designates a monitoring account that can view linked accounts' metrics, logs, and traces in unified dashboards."},
+{id:"M09",d:"Monitoring",diff:3,q:"Synthetic checks must exercise a critical multi-step user flow (login → add to cart → checkout) every 5 minutes and alarm on failure. What do you use?",o:["Ping only","CloudWatch Synthetics canaries scripting the flow, with alarms on canary success rate","Waiting for customer complaints","A weekly manual test"],a:1,x:"Synthetics canaries run scripted browser/API flows on schedules, emitting metrics you alarm on — catching breakage before users report it."},
+{id:"E01",d:"Incident",diff:1,q:"An unhealthy instance behind an ALB should be replaced automatically. Which combination does this?",o:["ALB health checks + Auto Scaling group health check replacement","Manual replacement","CloudFront","A bigger instance"],a:0,x:"With ELB health checks feeding the ASG, failing instances are terminated and replaced automatically — baseline self-healing."},
+{id:"E02",d:"Incident",diff:2,q:"When GuardDuty detects cryptomining on an EC2 instance, response must be automatic: isolate the instance and notify security. What is the standard pattern?",o:["Read findings monthly","EventBridge rule on the GuardDuty finding invoking automation (Lambda/SSM) to quarantine SG + SNS notification","Delete GuardDuty","Reboot and hope"],a:1,x:"Findings flow through EventBridge; rules trigger remediation automation (swap to isolation security group, snapshot for forensics) and alerting — event-driven incident response."},
+{id:"E03",d:"Incident",diff:2,q:"Ops needs runbooks that execute multi-step remediation (restart service, clear disk, escalate) with approvals and audit trail. Which service?",o:["Systems Manager Automation documents (runbooks)","Amazon SES","AWS Amplify","Elastic Transcoder"],a:0,x:"SSM Automation runbooks codify operational procedures with steps, parameters, optional approvals, and full execution history — runbooks as code."},
+{id:"E04",d:"Incident",diff:2,q:"A Lambda processing stream events starts erroring after a bad deploy at 2 AM. Which prepared mechanism minimizes impact fastest?",o:["Debug live in production","Automatic rollback: CodeDeploy alias shift reversal on alarm breach (or one-click redeploy of previous version)","Rewrite the function","Pause the business"],a:1,x:"Alarm-triggered rollback during traffic shifting reverts to the stable version in minutes without human debugging at 2 AM — MTTR is about prepared paths, not heroics."},
+{id:"E05",d:"Incident",diff:3,q:"Post-incident, you must reconstruct exactly which API calls modified a security group last Tuesday. Where do you look?",o:["CloudWatch metrics","CloudTrail event history / a CloudTrail Lake or Athena query over trail logs","The EC2 console screenshots","DNS logs"],a:1,x:"CloudTrail records control-plane API calls (who, what, when, from where). Querying trail data answers modification-forensics questions; metrics show symptoms, not actors."},
+{id:"E06",d:"Incident",diff:2,q:"Systems Manager Incident Manager primarily adds what to your response process?",o:["Cheaper EC2","Response plans: engagement/escalation of on-call contacts, runbook launch, and incident tracking timelines","DNS hosting","Container builds"],a:1,x:"Incident Manager operationalizes response: contacts/escalation, chat channels, automatic runbook invocation, and a timeline for postmortems."},
+{id:"E07",d:"Incident",diff:3,q:"An SQS-driven worker fleet fell behind after an outage; the backlog will take days at current capacity. What is the prepared-automation answer?",o:["Wait","Target tracking scaling on backlog-per-instance (queue depth ÷ fleet size) so the fleet scales with backlog, tested before it was needed","Delete the queue","Ask users to retry later"],a:1,x:"Scaling on backlog-per-worker is the canonical SQS scaling pattern; recovery capacity becomes automatic. Untested scaling policies discovered during incidents are how backlogs become outages."},
+{id:"E08",d:"Incident",diff:1,q:"Which service sends notifications to email/SMS/chat when alarms fire?",o:["Amazon SNS (often into chat via AWS Chatbot)","Amazon RDS","AWS Glue","Amazon EMR"],a:0,x:"Alarms publish to SNS topics; subscriptions fan out to email, SMS, Lambda, and Chatbot for Slack/Teams delivery."},
+{id:"C01",d:"Security",diff:1,q:"An EC2 application needs to call S3. What is the correct way to give it credentials?",o:["Access keys in a config file","An IAM role attached via instance profile","The root account keys","Keys in user data"],a:1,x:"Instance roles deliver auto-rotated temporary credentials via the metadata service — no stored keys to leak. Any keys-on-disk answer is wrong on this exam."},
+{id:"C02",d:"Security",diff:2,q:"Which service continuously records resource configuration changes and evaluates them against compliance rules (e.g., 'EBS volumes must be encrypted')?",o:["AWS Config with Config rules","CloudFront","SQS","EFS"],a:0,x:"Config records configuration timelines and evaluates managed/custom rules, optionally auto-remediating via SSM — continuous compliance, not point-in-time audits."},
+{id:"C03",d:"Security",diff:2,q:"Organization policy: no member account may ever disable CloudTrail. What enforces this even against account admins?",o:["A memo","A Service Control Policy (SCP) denying cloudtrail:StopLogging/DeleteTrail","Console tooltips","Strong passwords"],a:1,x:"SCPs are organization-level guardrails that bound what even administrators in member accounts can do — the enforcement layer above IAM."},
+{id:"C04",d:"Security",diff:2,q:"Secrets used by applications must rotate automatically every 30 days without redeploying apps. Which service natively supports this?",o:["Plain SSM String parameters","AWS Secrets Manager with rotation Lambdas","A shared spreadsheet","Hardcoded env vars in AMIs"],a:1,x:"Secrets Manager schedules rotation via Lambda (built-in for RDS etc.); apps fetch at runtime so rotation needs no redeploy. Standard SSM String parameters don't rotate."},
+{id:"C05",d:"Security",diff:3,q:"Auditors require proof that pipeline IAM roles have no unused broad permissions. Which native capability generates least-privilege evidence and policy refinement?",o:["Guesswork","IAM Access Analyzer policy generation / last-accessed data to right-size role policies","Deleting all roles","Screenshots of the console"],a:1,x:"Access Analyzer generates policies from actual CloudTrail activity and last-accessed data shows unused services — evidence-driven least privilege."},
+{id:"C06",d:"Security",diff:2,q:"All data in a new S3 bucket must be encrypted with a customer-managed KMS key, and unencrypted uploads must be impossible. What do you configure?",o:["Nothing; S3 is always fine","Default bucket encryption with the CMK plus a bucket policy denying puts without the required encryption header","A README in the bucket","Client-side pinky promise"],a:1,x:"Default encryption sets the baseline; the deny policy makes non-compliant uploads fail. Enforcement lives in policy, not convention."},
+{id:"C07",d:"Security",diff:2,q:"Findings from GuardDuty, Inspector, and Config across 40 accounts must appear in one prioritized view. Which service aggregates them?",o:["AWS Security Hub (with cross-account/Region aggregation)","Amazon Route 53","AWS Backup","EC2 dashboard"],a:0,x:"Security Hub normalizes findings (ASFF), aggregates across accounts/regions, scores against standards, and feeds automation via EventBridge."},
+{id:"C08",d:"Security",diff:3,q:"A pipeline must block deployment if the CloudFormation template grants iam:* or creates public security groups. Where is the check implemented?",o:["After deployment only","Policy-as-code (cfn-guard/cfn-nag/OPA) as a failing pipeline stage before the deploy action","In users' heads","Only in prod"],a:1,x:"Template scanning in the pipeline fails fast pre-deploy — the codified security review. Post-deploy detection means the risk already existed."},
+{id:"C09",d:"Security",diff:1,q:"Temporary credentials for a CI job assuming a role are preferable to long-lived IAM user keys because…",o:["They never expire","They expire automatically and grant only the assumed role's scoped permissions","They bypass IAM","They are stored in the repo"],a:1,x:"STS credentials are short-lived and scoped, shrinking the blast radius of any leak — the same principle as OIDC federation for external CI."}
+] },
+};
+const SIZE=50, PASS=700;
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||{attempts:[],qh:{}}}catch(e){return{attempts:[],qh:{}}}}
-function save(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
-let DATA=load();
-
+let USER=localStorage.getItem("trainer-user")||"";
+let STATE={};            // {certKey:{attempts:[],qh:{},prog:null}}
+let CK=null;             // active cert key
 let exam=[],idx=0,sel=[],revealed=false,results=[];
+let syncOk=true;
 
-function buildExam(){
-  const h=DATA.qh;
-  const missed=shuffle(BANK.filter(q=>h[q.id]&&h[q.id].missed>0));
-  const unseen=shuffle(BANK.filter(q=>!h[q.id]));
-  const seenOk=shuffle(BANK.filter(q=>h[q.id]&&!(h[q.id].missed>0)));
-  const p=[];
-  for(const q of missed){if(p.length<15)p.push(q)}
-  for(const q of unseen){if(p.length<SIZE)p.push(q)}
-  for(const q of seenOk){if(p.length<SIZE)p.push(q)}
-  for(const q of missed.slice(15)){if(p.length<SIZE)p.push(q)}
-  const by=d=>shuffle(p.filter(q=>q.diff===d));
-  return [...by(1),...by(2),...by(3)];
+function certState(k){ if(!STATE[k]) STATE[k]={attempts:[],qh:{},prog:null}; return STATE[k]; }
+async function loadState(){
+  try{ const r=await fetch("/api/state?user="+encodeURIComponent(USER)); const j=await r.json(); STATE=j.state||{}; syncOk=true; }
+  catch(e){ STATE={}; syncOk=false; }
+  note();
+}
+let saveTimer=null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{ const r=await fetch("/api/state",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({user:USER,state:STATE})}); syncOk=r.ok; }
+    catch(e){ syncOk=false; }
+    note();
+  },300);
+}
+function note(){ const n=$("syncNote"); if(!n)return;
+  n.textContent = syncOk? "Synced as “"+USER+"” · scores follow you across devices" : "⚠ Server sync unavailable — progress may not persist";
+  n.className="syncnote"+(syncOk?"":" err");
 }
 
-function view(v){["v-home","v-exam","v-done"].forEach(x=>$(x).classList.toggle("hide",x!==v))}
+function view(v){["v-home","v-cert","v-exam","v-done"].forEach(x=>$(x).classList.toggle("hide",x!==v))}
+function setAccent(a){document.documentElement.style.setProperty("--ac",a)}
 
-function verdictOf(att){
+// ---------- home ----------
+function renderHome(){
+  $("certList").innerHTML=Object.entries(CERTS).map(([k,c])=>{
+    const s=certState(k);
+    const last=s.attempts[s.attempts.length-1];
+    const st= last? `Best ${Math.max(...s.attempts.map(a=>a.score))} · last ${last.score} (${last.score>=PASS?"pass":"fail"}) · ${s.attempts.length} attempt${s.attempts.length>1?"s":""}` : `${c.bank.length} questions in bank · no attempts yet`;
+    const res= s.prog? `<span class="resume">▶ Resume — Q${s.prog.results.length+1} of ${s.prog.ids.length}</span>`:"";
+    return `<button class="certcard" data-k="${k}" style="--cc:${c.accent}"><div class="code">${c.code}</div><div class="nm">${esc(c.name)}</div><div class="st">${esc(st)}</div>${res}</button>`;
+  }).join("");
+  $("certList").querySelectorAll(".certcard").forEach(b=>b.onclick=()=>openCert(b.dataset.k));
+  note();
+}
+
+// ---------- cert page ----------
+function verdictOf(att,labels){
   const pct=att.correct/att.total;
   const weak=Object.entries(att.dom).filter(([,s])=>s.r/s.t<0.7).map(([d,s])=>({d,pct:Math.round(100*s.r/s.t)}));
   let v,t;
   if(pct>=0.8&&weak.length===0){v="You're ready. Book the exam.";t="good"}
-  else if(pct>=0.7){v="Close. Pass-line territory, but tighten the weak domains before booking.";t="warn"}
+  else if(pct>=0.7){v="Close. Pass-line territory — tighten the weak domains before booking.";t="warn"}
   else{v="Not yet. Focused study on the flagged domains will move you fastest.";t="bad"}
-  return{v,t,weak};
+  return{v,t,weak,labels};
+}
+function openCert(k){
+  CK=k; const c=CERTS[k]; setAccent(c.accent);
+  $("cEyebrow").textContent=c.code+" · EXAM TRAINER";
+  $("cTitle").textContent=c.name;
+  $("cSub").textContent=c.sub;
+  const s=certState(k);
+  $("startBtn").textContent = s.prog? `Resume exam — question ${s.prog.results.length+1} of ${s.prog.ids.length}` : (s.attempts.length? "Start new exam":"Start first exam");
+  const last=s.attempts[s.attempts.length-1];
+  if(last){ const r=verdictOf(last,c.labels);
+    $("cVerdict").innerHTML=`<div class="banner b-${r.t}"><b>Latest verdict</b><br>${esc(r.v)}${r.weak.length?`<br><span style="color:var(--dim)">Focus: ${r.weak.map(w=>esc(c.labels[w.d])+" ("+w.pct+"%)").join(" · ")}</span>`:""}</div>`;
+  } else $("cVerdict").innerHTML="";
+  if(s.attempts.length){
+    $("cHist").innerHTML=`<div class="sect">SCORE HISTORY</div>`+
+      [...s.attempts].reverse().map(a=>`<div class="hist"><span class="dt">${new Date(a.date).toLocaleDateString()} · ${a.correct}/${a.total}</span><span class="${a.score>=PASS?"pass":"fail"}">${a.score}<span class="mini">${a.score>=PASS?"PASS":"FAIL"}</span></span></div>`).join("")+
+      `<button class="reset" id="resetBtn">Reset history for this cert</button>`;
+    $("resetBtn").onclick=()=>{ if(confirm("Delete all "+c.code+" scores, question history, and any in-progress exam?")){ STATE[k]={attempts:[],qh:{},prog:null}; saveState(); openCert(k);} };
+  } else $("cHist").innerHTML="";
+  view("v-cert");
 }
 
-function renderHome(){
-  const last=DATA.attempts[DATA.attempts.length-1];
-  const vd=$("homeVerdict");
-  if(last){
-    const r=verdictOf(last);
-    vd.innerHTML=`<div class="banner b-${r.t}"><b>Latest verdict</b><br>${esc(r.v)}${r.weak.length?`<br><span style="color:var(--dim)">Focus: ${r.weak.map(w=>esc(LABEL[w.d])+" ("+w.pct+"%)").join(" · ")}</span>`:""}</div>`;
-  } else vd.innerHTML="";
-  const hh=$("homeHist");
-  if(DATA.attempts.length){
-    hh.innerHTML=`<div class="sect">SCORE HISTORY</div>`+
-      [...DATA.attempts].reverse().map(a=>`<div class="hist"><span class="dt">${new Date(a.date).toLocaleDateString()} · ${a.correct}/${a.total}</span><span class="${a.score>=PASS?"pass":"fail"}">${a.score}<span class="mini">${a.score>=PASS?"PASS":"FAIL"}</span></span></div>`).join("")+
-      `<button class="reset" id="resetBtn">Reset all history</button>`;
-    $("resetBtn").onclick=()=>{if(confirm("Delete all scores and question history?")){DATA={attempts:[],qh:{}};save(DATA);renderHome();}};
-  } else hh.innerHTML="";
+// ---------- exam ----------
+function buildExam(k){
+  const bank=CERTS[k].bank, h=certState(k).qh;
+  const missed=shuffle(bank.filter(q=>h[q.id]&&h[q.id].missed>0));
+  const unseen=shuffle(bank.filter(q=>!h[q.id]));
+  const seenOk=shuffle(bank.filter(q=>h[q.id]&&!(h[q.id].missed>0)));
+  const n=Math.min(SIZE,bank.length);
+  const p=[];
+  for(const q of missed){if(p.length<Math.min(15,n))p.push(q)}
+  for(const q of unseen){if(p.length<n)p.push(q)}
+  for(const q of seenOk){if(p.length<n)p.push(q)}
+  for(const q of missed.slice(15)){if(p.length<n)p.push(q)}
+  const by=d=>shuffle(p.filter(q=>q.diff===d));
+  return [...by(1),...by(2),...by(3)];
 }
+const byId=(k,id)=>CERTS[k].bank.find(q=>q.id===id);
 
 function start(){
-  exam=buildExam();idx=0;results=[];
-  view("v-exam");renderQ();
+  const s=certState(CK);
+  if(s.prog){ // resume
+    exam=s.prog.ids.map(id=>byId(CK,id)).filter(Boolean);
+    results=[...s.prog.results];
+    idx=results.length;
+    if(idx>=exam.length){ s.prog=null; saveState(); return start(); }
+  } else {
+    exam=buildExam(CK); results=[]; idx=0;
+    s.prog={ids:exam.map(q=>q.id),results:[]};
+    saveState();
+  }
+  view("v-exam"); renderQ();
 }
 
 function renderQ(){
-  const q=exam[idx];sel=[];revealed=false;
+  const c=CERTS[CK], q=exam[idx]; sel=[]; revealed=false;
   $("qCount").textContent=`Question ${idx+1} of ${exam.length}`;
-  $("qDom").textContent=LABEL[q.d];
-  const dv=$("qDiff");dv.textContent=q.diff===1?"Easy":q.diff===2?"Medium":"Hard";
+  $("qDom").textContent=c.labels[q.d]||q.d;
+  const dv=$("qDiff"); dv.textContent=q.diff===1?"Easy":q.diff===2?"Medium":"Hard";
   dv.className="pill "+(q.diff===1?"e":q.diff===2?"m":"h");
   $("qBar").style.width=(idx/exam.length*100)+"%";
   $("qText").textContent=q.q;
@@ -269,13 +429,12 @@ function renderQ(){
   $("qOpts").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     if(revealed)return;
     const i=+b.dataset.i;
-    if(q.multi){sel=sel.includes(i)?sel.filter(x=>x!==i):[...sel,i]}
-    else sel=[i];
+    if(q.multi){sel=sel.includes(i)?sel.filter(x=>x!==i):[...sel,i]} else sel=[i];
     $("qOpts").querySelectorAll(".opt").forEach(x=>x.classList.toggle("sel",sel.includes(+x.dataset.i)));
     $("submitBtn").disabled=sel.length===0;
   });
-  $("submitBtn").disabled=true;$("submitBtn").classList.remove("hide");
-  $("qExplain").innerHTML="";$("nextBtn").classList.add("hide");
+  $("submitBtn").disabled=true; $("submitBtn").classList.remove("hide");
+  $("qExplain").innerHTML=""; $("nextBtn").classList.add("hide");
   $("nextBtn").textContent=idx===exam.length-1?"Finish & see score":"Next question";
 }
 
@@ -284,48 +443,67 @@ $("submitBtn").onclick=()=>{
   const corr=q.multi?q.a:[q.a];
   const ok=q.multi?(sel.length===corr.length&&corr.every(c=>sel.includes(c))):sel[0]===q.a;
   results.push({id:q.id,d:q.d,ok});
+  const s=certState(CK); if(s.prog) s.prog.results=[...results]; saveState();
   revealed=true;
   $("qOpts").querySelectorAll(".opt").forEach(b=>{
-    const i=+b.dataset.i;
-    b.classList.remove("sel");
+    const i=+b.dataset.i; b.classList.remove("sel");
     if(corr.includes(i))b.classList.add("right");
     else if(sel.includes(i))b.classList.add("wrong");
     else b.classList.add("mute");
   });
-  $("qExplain").innerHTML=`<div class="explain ${ok?"b-good":"b-bad"}" style="border-style:solid"><b>${ok?"Correct":"Incorrect"}</b>${esc(q.x)}</div>`;
-  $("submitBtn").classList.add("hide");
-  $("nextBtn").classList.remove("hide");
+  $("qExplain").innerHTML=`<div class="explain ${ok?"b-good":"b-bad"}"><b>${ok?"Correct":"Incorrect"}</b>${esc(q.x)}</div>`;
+  $("submitBtn").classList.add("hide"); $("nextBtn").classList.remove("hide");
 };
 
 $("nextBtn").onclick=()=>{
   if(idx<exam.length-1){idx++;renderQ();return}
+  finish();
+};
+
+function finish(){
+  const s=certState(CK), c=CERTS[CK];
   const correct=results.filter(r=>r.ok).length;
   const score=Math.round(correct/results.length*1000);
   const dom={};
   for(const r of results){dom[r.d]=dom[r.d]||{r:0,t:0};dom[r.d].t++;if(r.ok)dom[r.d].r++}
-  for(const r of results){const h=DATA.qh[r.id]||{seen:0,missed:0};DATA.qh[r.id]={seen:h.seen+1,missed:h.missed+(r.ok?0:1)}}
+  for(const r of results){const h=s.qh[r.id]||{seen:0,missed:0};s.qh[r.id]={seen:h.seen+1,missed:h.missed+(r.ok?0:1)}}
   const att={date:new Date().toISOString(),score,correct,total:results.length,dom};
-  DATA.attempts.push(att);save(DATA);
-  renderDone(att);view("v-done");
-};
-
-function renderDone(att){
-  $("dScore").textContent=att.score;
-  $("dScore").style.color=att.score>=PASS?"var(--good)":"var(--bad)";
-  $("dDetail").textContent=`${att.correct}/${att.total} correct · pass mark ${PASS}`;
-  $("dBadge").innerHTML=`<span class="badge ${att.score>=PASS?"p":"f"}">${att.score>=PASS?"PASS":"FAIL"}</span>`;
-  const r=verdictOf(att);
-  $("dVerdict").innerHTML=`<div class="banner b-${r.t}"><b>Readiness</b><br>${esc(r.v)}${r.weak.length?`<br><span style="color:var(--dim)">Focus: ${r.weak.map(w=>esc(LABEL[w.d])+" ("+w.pct+"%)").join(" · ")}</span>`:""}</div>`;
-  $("dDomains").innerHTML=Object.entries(att.dom).map(([d,s])=>{
-    const pct=Math.round(100*s.r/s.t);
-    return `<div class="dom"><div class="row"><span>${esc(LABEL[d])}</span><span style="color:${pct>=70?"var(--good)":"var(--bad)"}">${s.r}/${s.t} · ${pct}%</span></div><div class="track"><div class="fill" style="width:${pct}%;background:${pct>=70?"var(--good)":"var(--bad)"}"></div></div></div>`;
+  s.attempts.push(att); s.prog=null; saveState();
+  $("dScore").textContent=score;
+  $("dScore").style.color=score>=PASS?"var(--good)":"var(--bad)";
+  $("dDetail").textContent=`${correct}/${results.length} correct · pass mark ${PASS}`;
+  $("dBadge").innerHTML=`<span class="badge ${score>=PASS?"p":"f"}">${score>=PASS?"PASS":"FAIL"}</span>`;
+  const r=verdictOf(att,c.labels);
+  $("dVerdict").innerHTML=`<div class="banner b-${r.t}"><b>Readiness</b><br>${esc(r.v)}${r.weak.length?`<br><span style="color:var(--dim)">Focus: ${r.weak.map(w=>esc(c.labels[w.d])+" ("+w.pct+"%)").join(" · ")}</span>`:""}</div>`;
+  $("dDomains").innerHTML=Object.entries(dom).map(([d,s2])=>{
+    const pct=Math.round(100*s2.r/s2.t);
+    return `<div class="dom"><div class="row"><span>${esc(c.labels[d]||d)}</span><span style="color:${pct>=70?"var(--good)":"var(--bad)"}">${s2.r}/${s2.t} · ${pct}%</span></div><div class="track"><div class="fill" style="width:${pct}%;background:${pct>=70?"var(--good)":"var(--bad)"}"></div></div></div>`;
   }).join("");
+  view("v-done");
 }
 
+$("exitBtn").onclick=()=>{ saveState(); openCert(CK); };
 $("startBtn").onclick=start;
-$("againBtn").onclick=start;
-$("homeBtn").onclick=()=>{renderHome();view("v-home")};
-renderHome();
+$("againBtn").onclick=()=>{ start(); };
+$("doneHomeBtn").onclick=()=>openCert(CK);
+$("backHome").onclick=()=>{ setAccent("var(--az)"); renderHome(); view("v-home"); };
+
+// ---------- boot ----------
+(async function(){
+  if(!USER){
+    $("nameModal").classList.remove("hide");
+    $("nameGo").onclick=async()=>{
+      const v=$("nameInput").value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,30);
+      if(!v)return;
+      USER=v; localStorage.setItem("trainer-user",USER);
+      $("nameModal").classList.add("hide");
+      await loadState(); renderHome();
+    };
+    $("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").click()});
+  } else {
+    await loadState(); renderHome();
+  }
+})();
 </script>
 </body>
 </html>
