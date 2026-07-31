@@ -90,14 +90,17 @@ input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--edge);ba
 <script>
 (function(){
   var box=document.getElementById('dbg'), lines=[];
-  window.dbgLog=function(m){ lines.unshift(new Date().toISOString().slice(11,19)+' '+m); lines=lines.slice(0,6); box.innerHTML=lines.join('<br>'); };
   ['pointerdown','mousedown','click'].forEach(function(t){
     document.addEventListener(t,function(e){
       var el=e.target||{}; var id=el.id||el.className&&String(el.className).split(' ')[0]||el.tagName||'?';
       dbgLog(t+' → '+id+' (trusted:'+e.isTrusted+')');
     },true);
   });
-  window.addEventListener('error',function(e){ dbgLog('JS ERROR: '+e.message); });
+  var errs=[];
+  window.addEventListener('error',function(e){ errs.unshift('JS ERROR: '+e.message+' @'+(e.lineno||'?')); render(); });
+  window.addEventListener('unhandledrejection',function(e){ errs.unshift('PROMISE ERROR: '+(e.reason&&e.reason.message||e.reason)); render(); });
+  function render(){ box.innerHTML = errs.concat(lines).slice(0,8).join('<br>'); }
+  window.dbgLog=function(m){ lines.unshift(new Date().toISOString().slice(11,19)+' '+m); lines=lines.slice(0,6); render(); };
   window.dbgLog('debug panel armed — every click you make should print here');
 })();
 </script>
@@ -519,16 +522,25 @@ document.addEventListener("click",e=>{
   if(!USER){
     $("nameModal").classList.remove("hide");
     const goName=async()=>{
-      const inp=document.getElementById("nameInput");
-      const v=(inp?inp.value:"").trim().toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,30);
-      if(!v)return;
-      USER=v;
-      $("nameModal").classList.add("hide");
-      lsSet("trainer-user",USER);
-      await loadState(); renderHome();
+      try{
+        window.dbgLog&&dbgLog('goName: entered');
+        const inp=document.getElementById("nameInput");
+        const v=(inp?inp.value:"").trim().toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,30);
+        window.dbgLog&&dbgLog('goName: name="'+v+'"');
+        if(!v){ window.dbgLog&&dbgLog('goName: EMPTY NAME — stopping'); return; }
+        USER=v;
+        $("nameModal").classList.add("hide");
+        window.dbgLog&&dbgLog('goName: modal hidden');
+        lsSet("trainer-user",USER);
+        await loadState();
+        window.dbgLog&&dbgLog('goName: state loaded');
+        renderHome();
+        window.dbgLog&&dbgLog('goName: home rendered ✓');
+      }catch(err){ window.dbgLog&&dbgLog('goName CRASHED: '+err.message); }
     };
     // Delegated listeners: survive extensions replacing DOM nodes.
-    document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("#nameGo")) goName(); },true);
+    document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("#nameGo")){ window.dbgLog&&dbgLog('router: nameGo matched, calling goName'); goName(); } },true);
+    window.dbgLog&&dbgLog('boot: name modal shown, goName listener registered');
     document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target&&e.target.id==="nameInput") goName(); },true);
   } else {
     await loadState(); renderHome();
