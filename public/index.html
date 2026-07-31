@@ -86,6 +86,21 @@ input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--edge);ba
 </style>
 </head>
 <body>
+<div id="dbg" style="position:fixed;bottom:10px;left:10px;right:10px;z-index:99;background:#000c;border:1px solid #345;border-radius:10px;padding:8px 12px;font:11px monospace;color:#9fd;max-height:110px;overflow:auto;pointer-events:none">booting…</div>
+<script>
+(function(){
+  var box=document.getElementById('dbg'), lines=[];
+  window.dbgLog=function(m){ lines.unshift(new Date().toISOString().slice(11,19)+' '+m); lines=lines.slice(0,6); box.innerHTML=lines.join('<br>'); };
+  ['pointerdown','mousedown','click'].forEach(function(t){
+    document.addEventListener(t,function(e){
+      var el=e.target||{}; var id=el.id||el.className&&String(el.className).split(' ')[0]||el.tagName||'?';
+      dbgLog(t+' → '+id+' (trusted:'+e.isTrusted+')');
+    },true);
+  });
+  window.addEventListener('error',function(e){ dbgLog('JS ERROR: '+e.message); });
+  window.dbgLog('debug panel armed — every click you make should print here');
+})();
+</script>
 <div class="wrap">
 
 <div class="modal hide" id="nameModal">
