@@ -352,7 +352,6 @@ function renderHome(){
     const res= s.prog? `<span class="resume">▶ Resume — Q${s.prog.results.length+1} of ${s.prog.ids.length}</span>`:"";
     return `<button class="certcard" data-k="${k}" style="--cc:${c.accent}"><div class="code">${c.code}</div><div class="nm">${esc(c.name)}</div><div class="st">${esc(st)}</div>${res}</button>`;
   }).join("");
-  $("certList").querySelectorAll(".certcard").forEach(b=>b.onclick=()=>openCert(b.dataset.k));
   note();
 }
 
@@ -381,7 +380,6 @@ function openCert(k){
     $("cHist").innerHTML=`<div class="sect">SCORE HISTORY</div>`+
       [...s.attempts].reverse().map(a=>`<div class="hist"><span class="dt">${new Date(a.date).toLocaleDateString()} · ${a.correct}/${a.total}</span><span class="${a.score>=PASS?"pass":"fail"}">${a.score}<span class="mini">${a.score>=PASS?"PASS":"FAIL"}</span></span></div>`).join("")+
       `<button class="reset" id="resetBtn">Reset history for this cert</button>`;
-    $("resetBtn").onclick=()=>{ if(confirm("Delete all "+c.code+" scores, question history, and any in-progress exam?")){ STATE[k]={attempts:[],qh:{},prog:null}; saveState(); openCert(k);} };
   } else $("cHist").innerHTML="";
   view("v-cert");
 }
@@ -428,19 +426,12 @@ function renderQ(){
   $("qText").textContent=q.q;
   $("qMulti").classList.toggle("hide",!q.multi);
   $("qOpts").innerHTML=q.o.map((o,i)=>`<button class="opt" data-i="${i}"><span class="l">${String.fromCharCode(65+i)}.</span>${esc(o)}</button>`).join("");
-  $("qOpts").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
-    if(revealed)return;
-    const i=+b.dataset.i;
-    if(q.multi){sel=sel.includes(i)?sel.filter(x=>x!==i):[...sel,i]} else sel=[i];
-    $("qOpts").querySelectorAll(".opt").forEach(x=>x.classList.toggle("sel",sel.includes(+x.dataset.i)));
-    $("submitBtn").disabled=sel.length===0;
-  });
   $("submitBtn").disabled=true; $("submitBtn").classList.remove("hide");
   $("qExplain").innerHTML=""; $("nextBtn").classList.add("hide");
   $("nextBtn").textContent=idx===exam.length-1?"Finish & see score":"Next question";
 }
 
-$("submitBtn").onclick=()=>{
+function submitAnswer(){
   const q=exam[idx];
   const corr=q.multi?q.a:[q.a];
   const ok=q.multi?(sel.length===corr.length&&corr.every(c=>sel.includes(c))):sel[0]===q.a;
@@ -455,12 +446,12 @@ $("submitBtn").onclick=()=>{
   });
   $("qExplain").innerHTML=`<div class="explain ${ok?"b-good":"b-bad"}"><b>${ok?"Correct":"Incorrect"}</b>${esc(q.x)}</div>`;
   $("submitBtn").classList.add("hide"); $("nextBtn").classList.remove("hide");
-};
+}
 
-$("nextBtn").onclick=()=>{
+function nextStep(){
   if(idx<exam.length-1){idx++;renderQ();return}
   finish();
-};
+}
 
 function finish(){
   const s=certState(CK), c=CERTS[CK];
@@ -484,11 +475,29 @@ function finish(){
   view("v-done");
 }
 
-$("exitBtn").onclick=()=>{ saveState(); openCert(CK); };
-$("startBtn").onclick=start;
-$("againBtn").onclick=()=>{ start(); };
-$("doneHomeBtn").onclick=()=>openCert(CK);
-$("backHome").onclick=()=>{ setAccent("var(--az)"); renderHome(); view("v-home"); };
+function chooseOpt(i){
+  if(revealed)return;
+  const q=exam[idx];
+  if(q.multi){sel=sel.includes(i)?sel.filter(x=>x!==i):[...sel,i]} else sel=[i];
+  document.querySelectorAll("#qOpts .opt").forEach(x=>x.classList.toggle("sel",sel.includes(+x.dataset.i)));
+  $("submitBtn").disabled=sel.length===0;
+}
+// Master delegated router — clicks are caught at the document level so
+// nothing that replaces or wraps individual buttons can break the app.
+document.addEventListener("click",e=>{
+  if(!e.target||!e.target.closest) return;
+  const hit=s=>e.target.closest(s);
+  const cc=hit(".certcard"); if(cc){openCert(cc.dataset.k);return}
+  const op=hit("#qOpts .opt"); if(op){chooseOpt(+op.dataset.i);return}
+  if(hit("#startBtn")){start();return}
+  if(hit("#submitBtn")){submitAnswer();return}
+  if(hit("#nextBtn")){nextStep();return}
+  if(hit("#exitBtn")){saveState();openCert(CK);return}
+  if(hit("#againBtn")){start();return}
+  if(hit("#doneHomeBtn")){openCert(CK);return}
+  if(hit("#backHome")){setAccent("var(--az)");renderHome();view("v-home");return}
+  if(hit("#resetBtn")){const c=CERTS[CK];if(confirm("Delete all "+c.code+" scores, question history, and any in-progress exam?")){STATE[CK]={attempts:[],qh:{},prog:null};saveState();openCert(CK);}return}
+},true);
 
 // ---------- boot ----------
 (async function(){
