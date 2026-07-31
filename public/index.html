@@ -1,313 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>Quiz Arcade — SOX Intermediate</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,900&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AZ-400 Exam Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  :root{
-    --void:#151030; --panel:#211a45; --panel-2:#2c2358;
-    --ink:#f3f0ff; --dim:#a79fd0;
-    --gold:#ffd24a; --coral:#ff5d73; --teal:#33d6b8; --violet:#9a86ff;
-    --ok:#33d6b8; --bad:#ff5d73;
-    --ring:#3a2f6e;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    font-family:"Space Grotesk",system-ui,sans-serif;
-    background:radial-gradient(120% 90% at 50% -10%, #241b52 0%, var(--void) 60%);
-    color:var(--ink); min-height:100dvh;
-    display:flex; align-items:center; justify-content:center; padding:20px;
-    overflow-x:hidden;
-  }
-  .stage{width:100%; max-width:760px}
-  .screen{display:none; animation:rise .35s ease}
-  .screen.on{display:block}
-  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-
-  .brand{font-family:"Fraunces",serif; font-weight:900; letter-spacing:-.02em;
-    font-size:clamp(2.2rem,7vw,3.4rem); line-height:.95; text-align:center}
-  .brand em{font-style:italic; color:var(--gold)}
-  .tag{text-align:center;color:var(--dim);margin:.6rem 0 2rem;font-size:.95rem}
-
-  .card{background:linear-gradient(180deg,var(--panel),var(--void));
-    border:1px solid var(--ring); border-radius:20px; padding:1.6rem}
-  .stack{display:flex;flex-direction:column;gap:.8rem}
-
-  button{font:inherit;cursor:pointer;border:0;border-radius:14px;color:var(--ink)}
-  .big{padding:1.1rem;font-size:1.15rem;font-weight:700;
-    background:var(--gold);color:#2a1c00;box-shadow:0 6px 0 #b8942f;transition:transform .06s,box-shadow .06s}
-  .big:active{transform:translateY(4px);box-shadow:0 2px 0 #b8942f}
-  .ghost{padding:1rem;background:var(--panel-2);border:1px solid var(--ring);font-weight:600}
-  .ghost:active{transform:translateY(2px)}
-
-  input{width:100%;padding:1rem;border-radius:14px;border:1px solid var(--ring);
-    background:var(--void);color:var(--ink);font:inherit;text-align:center}
-  input.code{letter-spacing:.4em;text-transform:uppercase;font-size:1.6rem;font-weight:700;font-family:"Fraunces",serif}
-  label{font-size:.8rem;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.35rem;display:block}
-
-  /* lobby / code display */
-  .codebox{text-align:center;margin:.5rem 0 1.2rem}
-  .codebox .label{font-size:.75rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase}
-  .codebox .val{font-family:"Fraunces",serif;font-weight:900;letter-spacing:.15em;
-    font-size:clamp(3rem,14vw,5.5rem);color:var(--gold);line-height:1}
-  .players{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1rem 0}
-  .chip{background:var(--panel-2);border:1px solid var(--ring);padding:.5rem .9rem;border-radius:999px;font-weight:600;animation:rise .3s ease}
-  .count{text-align:center;color:var(--dim);font-size:.85rem}
-
-  /* question */
-  .qhead{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:.85rem;margin-bottom:.7rem}
-  .timer{height:10px;border-radius:999px;background:var(--ring);overflow:hidden;margin-bottom:1.2rem}
-  .timer > i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));width:100%;transition:width .1s linear}
-  .qtext{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(1.4rem,4.5vw,2.1rem);line-height:1.2;margin-bottom:1.4rem;text-align:center}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
-  .opt{padding:1.1rem;border-radius:16px;font-weight:700;font-size:1.05rem;text-align:left;
-    display:flex;align-items:center;gap:.7rem;min-height:76px;color:#160f12;transition:transform .08s,opacity .2s,filter .2s}
-  .opt .sym{font-size:1.3rem;width:1.6rem;text-align:center;flex:none}
-  .opt:active{transform:scale(.97)}
-  .opt.c0{background:var(--coral)} .opt.c1{background:var(--teal)}
-  .opt.c2{background:var(--gold)}  .opt.c3{background:var(--violet)}
-  .opt.dim{opacity:.25;filter:grayscale(.4)}
-  .opt.win{outline:4px solid #fff;transform:scale(1.02)}
-  .locked{text-align:center;margin-top:1.3rem;color:var(--dim)}
-  .locked b{color:var(--gold)}
-
-  /* reveal / result */
-  .result{text-align:center}
-  .verdict{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2rem,9vw,3.2rem)}
-  .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
-  .gain{font-size:1.3rem;font-weight:700;margin:.3rem 0 1.2rem}
-  .board{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
-  .row{display:flex;align-items:center;gap:.8rem;background:var(--panel-2);border:1px solid var(--ring);border-radius:12px;padding:.7rem 1rem}
-  .row .rank{font-family:"Fraunces",serif;font-weight:900;color:var(--gold);width:1.8rem}
-  .row .nm{flex:1;font-weight:600}
-  .row .sc{font-weight:700;font-variant-numeric:tabular-nums}
-  .row.me{outline:2px solid var(--gold)}
-
-  /* podium */
-  .podium{display:flex;justify-content:center;gap:1rem;align-items:flex-end;margin:1.5rem 0}
-  .pod{background:var(--panel-2);border:1px solid var(--ring);border-radius:14px 14px 0 0;padding:1rem .8rem;text-align:center;min-width:88px}
-  .pod .medal{font-size:1.6rem}
-  .pod .pn{font-weight:700;margin:.3rem 0;font-size:.95rem}
-  .pod .ps{color:var(--gold);font-weight:700}
-  .pod.p1{height:190px} .pod.p2{height:150px} .pod.p3{height:120px}
-
-  .err{background:#3a1420;border:1px solid var(--coral);color:#ffd9df;padding:.8rem 1rem;border-radius:12px;text-align:center;margin-bottom:1rem}
-  .hidden{display:none}
-  .center{text-align:center}
-  .mt{margin-top:1.2rem}
-  a.link{color:var(--gold)}
+:root{--bg:#0b1220;--card:#111a2e;--edge:#22304d;--ink:#e8edf7;--dim:#8b98b5;
+--blue:#38a3f5;--good:#2fd08f;--warn:#f2b544;--bad:#ff5d73}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+min-height:100vh;display:flex;justify-content:center;padding:24px}
+.wrap{width:100%;max-width:680px}
+.eyebrow{font-size:.7rem;letter-spacing:.3em;color:var(--blue);font-weight:700;margin:12px 0 8px}
+h1{font-size:2rem;letter-spacing:-.02em}
+h1 span{color:var(--dim);font-weight:500}
+.sub{color:var(--dim);font-size:.85rem;margin:8px 0 24px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:18px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;color:var(--ink)}
+.primary{width:100%;background:var(--blue);color:#04121f;font-weight:700;font-size:1.05rem;padding:15px;margin-bottom:26px}
+.primary:disabled{background:#1c2740;color:#526287}
+.ghost{background:#1c2740;padding:13px;font-weight:600}
+.hist{display:flex;justify-content:space-between;align-items:center;background:var(--card);
+border:1px solid var(--edge);border-radius:10px;padding:11px 15px;margin-bottom:8px;font-size:.9rem}
+.hist .dt{color:var(--dim)}
+.pass{color:var(--good);font-weight:700}.fail{color:var(--bad);font-weight:700}
+.mini{font-size:.7rem;color:var(--dim);font-weight:400;margin-left:4px}
+.sect{font-size:.7rem;letter-spacing:.2em;color:var(--dim);font-weight:700;margin:22px 0 10px}
+.banner{border-radius:12px;border:1px solid;padding:14px;margin-bottom:18px;font-size:.9rem;line-height:1.5}
+.b-good{border-color:#1d6b4c;background:#0d2b20}.b-warn{border-color:#7a5c1e;background:#2b230d}.b-bad{border-color:#7a2634;background:#2b0d14}
+.reset{background:none;color:var(--dim);font-size:.75rem;text-decoration:underline;margin-top:10px}
+.reset:hover{color:var(--bad)}
+/* exam */
+.meta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);margin:8px 0}
+.pill{padding:2px 9px;border-radius:99px;background:#1c2740;margin-left:6px}
+.pill.e{background:#0d2b20;color:var(--good)}.pill.m{background:#2b230d;color:var(--warn)}.pill.h{background:#2b0d14;color:var(--bad)}
+.bar{height:4px;background:#1c2740;border-radius:99px;margin-bottom:20px}
+.bar i{display:block;height:4px;background:var(--blue);border-radius:99px}
+.q{font-size:1.08rem;font-weight:600;line-height:1.5;margin-bottom:6px}
+.multi-note{color:var(--blue);font-size:.8rem;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--edge);
+border-radius:11px;padding:13px 15px;margin-bottom:8px;font-size:.92rem;line-height:1.45;transition:border-color .12s}
+.opt:hover{border-color:#3a4c74}
+.opt .l{color:var(--dim);font-family:monospace;margin-right:8px}
+.opt.sel{border-color:var(--blue);background:#0e2138}
+.opt.right{border-color:var(--good);background:#0d2b20}
+.opt.wrong{border-color:var(--bad);background:#2b0d14}
+.opt.mute{opacity:.5}
+.explain{border-radius:12px;border:1px solid;padding:14px;margin-top:16px;font-size:.9rem;line-height:1.55}
+.explain b{display:block;margin-bottom:4px}
+/* results */
+.score-wrap{text-align:center;margin:30px 0 24px}
+.score{font-size:4.5rem;font-weight:700;line-height:1}
+.badge{display:inline-block;margin-top:10px;padding:4px 16px;border-radius:99px;font-weight:700;font-size:.85rem}
+.badge.p{background:#0d2b20;color:var(--good)}.badge.f{background:#2b0d14;color:var(--bad)}
+.dom{margin-bottom:12px}
+.dom .row{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px}
+.dom .track{height:7px;background:#1c2740;border-radius:99px}
+.dom .fill{height:7px;border-radius:99px}
+.two{display:flex;gap:10px;margin-top:22px}
+.two button{flex:1}
+.hide{display:none}
 </style>
 </head>
 <body>
-<div class="stage">
+<div class="wrap">
 
-  <!-- LANDING -->
-  <section class="screen on" id="s-landing">
-    <h1 class="brand">Quiz <em>Arcade</em></h1>
-    <p class="tag">Host on the big screen. Everyone plays from their phone.</p>
-    <div class="card stack">
-      <div id="landErr"></div>
-      <button class="big" id="hostBtn">Host a game</button>
-      <div class="center" style="color:var(--dim);margin:.4rem 0">or</div>
-      <label>Game code</label>
-      <input class="code" id="joinCode" maxlength="4" placeholder="ABCD" autocomplete="off" />
-      <label>Your name</label>
-      <input id="joinName" maxlength="20" placeholder="e.g. Chris" autocomplete="off" />
-      <button class="ghost" id="joinBtn">Join game</button>
-    </div>
-  </section>
-
-  <!-- HOST LOBBY -->
-  <section class="screen" id="s-hostlobby">
-    <div class="card">
-      <div class="codebox">
-        <div class="label">Join at this site with code</div>
-        <div class="val" id="hostCode">----</div>
-      </div>
-      <div class="count" id="hostCount">Waiting for players…</div>
-      <div class="players" id="hostPlayers"></div>
-      <button class="big mt" id="startBtn" style="width:100%">Start game</button>
-    </div>
-  </section>
-
-  <!-- PLAYER LOBBY -->
-  <section class="screen" id="s-playerlobby">
-    <div class="card center">
-      <div class="codebox">
-        <div class="label">You're in — room</div>
-        <div class="val" id="pCode">----</div>
-      </div>
-      <p style="color:var(--dim)">Hang tight, <b id="pName" style="color:var(--ink)"></b>. The host starts the game.</p>
-    </div>
-  </section>
-
-  <!-- QUESTION -->
-  <section class="screen" id="s-question">
-    <div class="card">
-      <div class="qhead"><span id="qNum">Question</span><span id="qRole"></span></div>
-      <div class="timer"><i id="qBar"></i></div>
-      <div class="qtext" id="qText"></div>
-      <div class="grid" id="qGrid"></div>
-      <div class="locked hidden" id="qLocked"></div>
-    </div>
-  </section>
-
-  <!-- REVEAL -->
-  <section class="screen" id="s-reveal">
-    <div class="card">
-      <div class="result" id="revealResult"></div>
-      <div class="board" id="revealBoard"></div>
-      <button class="big mt hidden" id="nextBtn" style="width:100%">Next question</button>
-      <p class="center mt hidden" id="waitHost" style="color:var(--dim)">Waiting for host…</p>
-    </div>
-  </section>
-
-  <!-- END -->
-  <section class="screen" id="s-end">
-    <div class="card center">
-      <h2 class="brand" style="font-size:2rem">Final results</h2>
-      <div class="podium" id="podium"></div>
-      <div class="board" id="endBoard"></div>
-      <button class="ghost mt" onclick="location.reload()" style="width:100%">Play again</button>
-    </div>
-  </section>
-
+<div id="v-home">
+  <div class="eyebrow">EXAM TRAINER</div>
+  <h1>AZ-400 <span>DevOps Engineer Expert</span></h1>
+  <p class="sub">50 questions per attempt · Microsoft exam format · 700/1000 to pass · retakes mix questions you missed with ones you haven't seen. Scores save in this browser.</p>
+  <button class="primary" id="startBtn">Start exam</button>
+  <div id="homeVerdict"></div>
+  <div id="homeHist"></div>
 </div>
 
+<div id="v-exam" class="hide">
+  <div class="meta"><span id="qCount"></span><span><span class="pill" id="qDom"></span><span class="pill" id="qDiff"></span></span></div>
+  <div class="bar"><i id="qBar" style="width:0%"></i></div>
+  <div class="q" id="qText"></div>
+  <div class="multi-note hide" id="qMulti">Select all that apply.</div>
+  <div id="qOpts"></div>
+  <button class="primary" id="submitBtn" disabled style="margin-top:14px">Submit answer</button>
+  <div id="qExplain"></div>
+  <button class="primary hide" id="nextBtn" style="margin-top:14px;background:var(--ink);color:#04121f">Next question</button>
+</div>
+
+<div id="v-done" class="hide">
+  <div class="score-wrap">
+    <div class="eyebrow" style="text-align:center">SCALED SCORE</div>
+    <div class="score" id="dScore"></div>
+    <div style="color:var(--dim);margin-top:6px" id="dDetail"></div>
+    <div id="dBadge"></div>
+  </div>
+  <div id="dVerdict"></div>
+  <div class="sect">DOMAIN BREAKDOWN</div>
+  <div id="dDomains"></div>
+  <div class="two">
+    <button class="primary" id="againBtn" style="margin:0">Take another exam</button>
+    <button class="ghost" id="homeBtn">Home</button>
+  </div>
+</div>
+
+</div>
 <script>
-const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-const ws = new WebSocket(`${proto}://${location.host}`);
-const $ = id => document.getElementById(id);
-const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); };
-const SYM = ['▲','●','■','◆'];
+const BANK = [
+{id:"P01",d:"Processes",diff:1,q:"Your team wants work items to automatically move to 'Resolved' when a pull request that mentions them is merged. What should you use?",o:["A scheduled Logic App","Commit/PR keywords like 'Fixes #123' with work item transition settings","A manual board rule","Azure Monitor alerts"],a:1,x:"Azure DevOps and GitHub both support linking and transitioning work items via keywords (e.g., 'Fixes AB#123'). It's built-in — no automation infrastructure needed. The other options add complexity for something the platform already does."},
+{id:"P02",d:"Processes",diff:1,q:"You need a lightweight way for the team to document architecture decisions next to the code. What should you recommend?",o:["A SharePoint site","A project wiki or in-repo markdown docs","Email threads","A OneNote notebook"],a:1,x:"Keeping docs in a wiki or the repo itself keeps them versioned, reviewable through PRs, and close to the code. External stores drift out of date and aren't part of the engineering workflow."},
+{id:"P03",d:"Processes",diff:2,q:"Stakeholders complain they never know when a release goes out. What is the LEAST intrusive way to notify them automatically?",o:["Add them as approvers on the release stage","Configure service hooks / notifications to post to a Teams or Slack channel on deployment completion","Send a manual email after each release","Give them access to the pipeline logs"],a:1,x:"Service hooks push release events into the channels stakeholders already use, with zero manual effort and without inserting them into the approval flow. Making them approvers would block releases; manual email doesn't scale."},
+{id:"P04",d:"Processes",diff:2,q:"Your org tracks Deployment Frequency, Lead Time for Changes, Change Failure Rate, and MTTR. What are these collectively called?",o:["Scrum velocity metrics","DORA metrics","SLA metrics","ITIL KPIs"],a:1,x:"Those four are the DORA (DevOps Research and Assessment) metrics — the standard measures of software delivery performance, and AZ-400 expects you to know them by name and purpose."},
+{id:"P05",d:"Processes",diff:2,q:"A team's sprint board shows many items stuck in 'In Progress' for weeks. Which practice most directly addresses this?",o:["Increase sprint length","Set WIP limits on board columns","Add more developers","Disable the board"],a:1,x:"Work-in-progress limits force the team to finish items before starting new ones, exposing bottlenecks. Longer sprints or more people typically worsen unfinished-work sprawl."},
+{id:"P06",d:"Processes",diff:1,q:"You want new engineers to spin up a working dev environment in minutes. Which approach fits DevOps practice best?",o:["A 40-page setup wiki","Dev containers / codespaces or scripted, versioned environment setup","Cloning a teammate's laptop image","Shared VM everyone remotes into"],a:1,x:"Automated, versioned environment definitions (devcontainer.json, setup scripts, IaC) make onboarding repeatable and self-service. Documents rot and shared machines create conflicts."},
+{id:"P07",d:"Processes",diff:3,q:"Leadership wants a single number for 'engineering health.' As the DevOps lead, what is the best response per DevOps guidance?",o:["Report lines of code per sprint","Explain that a balanced set (e.g., DORA metrics) beats any single metric, and propose a small dashboard","Report number of deployments only","Report story points completed"],a:1,x:"Single metrics get gamed and hide trade-offs (speed vs. stability). DORA's paired throughput/stability measures are the accepted answer. LOC and story points are explicitly poor proxies for health."},
+{id:"P08",d:"Processes",diff:2,q:"Which Azure Boards feature lets you visualize dependencies and progress of work across multiple teams for a quarterly plan?",o:["Delivery Plans","Test Plans","Dashboards only","Queries"],a:0,x:"Delivery Plans show multiple teams' backlogs on a calendar timeline with dependency tracking — designed exactly for cross-team planning. Queries and dashboards can show data but not the interactive timeline view."},
+{id:"P09",d:"Processes",diff:1,q:"A retrospective reveals deployments are stressful, manual, and error-prone. What is the core DevOps remedy?",o:["Deploy less often","Automate the deployment pipeline so releases are repeatable and boring","Assign one hero engineer to own deployments","Only deploy on weekends"],a:1,x:"'If it hurts, do it more often and automate it.' Reducing frequency increases batch size and risk; hero engineers create bus-factor risk. Automation makes deployment a non-event."},
+{id:"P10",d:"Processes",diff:3,q:"You need feature-level usage data to decide whether to kill a feature. The feature is behind a flag. What is the most direct approach?",o:["Survey users by email","Emit custom telemetry events when the feature is used and analyze in Application Insights","Check code coverage","Count PRs touching that folder"],a:1,x:"Custom events tied to the flagged feature give hard usage data you can query. Surveys are slow and biased; coverage and PR counts measure development activity, not user value."},
+{id:"S01",d:"Source control",diff:1,q:"You need to prevent direct pushes to main and require at least two reviewer approvals. What should you configure?",o:["A pipeline trigger","Branch protection / branch policies on main","A CODEOWNERS file alone","Repository permissions set to read-only"],a:1,x:"Branch policies (Azure Repos) or branch protection rules (GitHub) enforce PR-only changes and minimum approvals. CODEOWNERS assigns reviewers but doesn't block pushes by itself; read-only would block everyone including the merge."},
+{id:"S02",d:"Source control",diff:1,q:"Which branching strategy uses short-lived topic branches merged frequently into a single main branch, and is recommended for CI/CD?",o:["GitFlow with long-lived develop/release branches","Trunk-based development","One branch per developer, merged quarterly","Fork-per-feature with no merges"],a:1,x:"Trunk-based development keeps branches short-lived and integrates continuously, minimizing merge debt — the strategy Microsoft's DevOps guidance recommends for CI/CD. GitFlow's long-lived branches slow integration."},
+{id:"S03",d:"Source control",diff:2,q:"A 700 MB dataset was committed to your Git repo and clones are now slow. What is the correct fix going forward?",o:["Store large files with Git LFS and purge them from history","Zip the file","Tell developers to use shallow clones forever","Switch to TFVC"],a:0,x:"Git LFS stores large binaries outside normal Git objects, keeping the repo fast; history rewriting (e.g., git filter-repo) removes the damage already done. Zipping doesn't help Git's delta storage, and shallow clones are a workaround, not a fix."},
+{id:"S04",d:"Source control",diff:2,multi:true,q:"You want every commit on main to be traceable to a reviewed PR and a work item. Which TWO policies enforce this? (Choose two.)",o:["Require pull requests for main","Require linked work items on PRs","Require signed tags","Require a minimum repo size"],a:[0,1],x:"PR-required plus linked-work-item policies give you review traceability and requirement traceability. Signed tags authenticate releases, not per-commit traceability, and repo size is irrelevant."},
+{id:"S05",d:"Source control",diff:2,q:"Your PR builds are green but main breaks after merging because main moved ahead. Which branch policy prevents this?",o:["Require comment resolution","Require branches to be up to date before merging (merge trains / 'build latest' validation)","Require more reviewers","Require squash merge"],a:1,x:"Validating the PR against the current tip of main (up-to-date requirement or merge queue) tests the actual post-merge state. Reviewers and squash merges don't address the stale-base problem."},
+{id:"S06",d:"Source control",diff:1,q:"Which merge type produces a single commit on main per PR, keeping history linear and readable?",o:["Merge commit","Squash merge","Rebase with merge commit","Octopus merge"],a:1,x:"Squash condenses the whole PR into one commit — the common choice for tidy main history. A merge commit preserves every intermediate commit; octopus merges are for multiple branches at once."},
+{id:"S07",d:"Source control",diff:3,q:"Compliance requires proving that code in production matches reviewed source. Which combination is strongest?",o:["Trust developer statements","Signed commits/tags plus a pipeline that builds only from protected branches and produces provenance metadata","Only deploy zip files by hand","Take screenshots of PRs"],a:1,x:"Cryptographic signing plus pipeline provenance (build from protected branch, recorded commit SHA, artifact attestation) forms a verifiable chain from review to production. The others are unverifiable process claims."},
+{id:"S08",d:"Source control",diff:2,q:"Two teams need different pipeline behavior but share one repo. You want pipeline changes reviewed like code. Where should the pipeline definition live?",o:["Classic editor (UI-only)","YAML files in the repository","A shared network drive","Variable groups"],a:1,x:"YAML pipelines are versioned with the code, go through PR review, and can branch alongside features. Classic UI pipelines aren't reviewable or versioned the same way; variable groups hold values, not definitions."},
+{id:"S09",d:"Source control",diff:2,q:"You must remove a secret accidentally committed three commits ago and already pushed. What is required?",o:["Delete the file in a new commit","Rewrite history to purge it AND rotate the secret, since it must be considered compromised","Rename the branch","Add it to .gitignore"],a:1,x:"Once pushed, assume the secret is leaked — rotation is mandatory. History rewriting (filter-repo/BFG) removes it from the repo, but rotation is the security-critical step. A new deleting commit leaves it in history; .gitignore only affects untracked files."},
+{id:"S10",d:"Source control",diff:1,q:"Which file lets you automatically assign specific reviewers when files in certain paths change in a PR?",o:["CONTRIBUTING.md",".gitattributes","CODEOWNERS","README.md"],a:2,x:"CODEOWNERS maps path patterns to required reviewers, and branch protection can enforce their approval. .gitattributes controls file handling, not review assignment."},
+{id:"S11",d:"Source control",diff:3,q:"A monorepo build takes 40 minutes although most PRs touch one service. What is the best first optimization?",o:["Buy bigger agents only","Path filters / selective builds so pipelines run only for changed areas","Split into 30 repos immediately","Disable tests"],a:1,x:"Path-filtered triggers and change-based test selection cut most PR builds dramatically with low risk. Repo splitting is a major restructure to consider later; bigger agents help less than not doing unnecessary work; disabling tests trades away safety."},
+{id:"S12",d:"Source control",diff:2,q:"Your team wants Git history where every commit on main passes CI even during high merge volume. Which mechanism serializes and validates merges automatically?",o:["Merge queue (merge trains)","Manual merge freeze windows","Optional CI","Cherry-picking to main"],a:0,x:"A merge queue batches or serializes candidate merges and validates each against the latest state before it lands, keeping main always green at scale. Freezes reduce throughput; optional CI defeats the purpose."},
+{id:"S13",d:"Source control",diff:1,q:"Which command-line sequence brings your local feature branch up to date with main while keeping a linear history?",o:["git fetch; git rebase origin/main","git pull --no-rebase","git merge origin/feature","git reset --hard HEAD~5"],a:0,x:"Fetch plus rebase replays your commits on top of current main — linear history. A default pull merge creates merge commits; reset --hard discards work."},
+{id:"S14",d:"Source control",diff:2,q:"You need the same Git tag to always point at the exact source used for a production build. When should tagging happen?",o:["Manually whenever someone remembers","Automatically in the release pipeline against the built commit SHA","Before writing the code","Weekly"],a:1,x:"Tagging from the pipeline against the exact SHA that was built removes human error and guarantees the tag matches the artifact. Manual/scheduled tagging drifts from reality."},
+{id:"S15",d:"Source control",diff:3,q:"An open-source project you maintain gets outside PRs. Pipeline secrets must never be exposed to fork PR builds. What is the correct posture?",o:["Give forks full secret access for convenience","Ensure fork builds don't receive secrets (default), and require maintainer approval before running workflows from first-time contributors","Disable PRs","Move secrets into the YAML file"],a:1,x:"Fork PR builds must run without secrets — both GitHub Actions and Azure Pipelines default this way — with maintainer approval gating first-run workflows. Secrets in YAML are visible to anyone who can read the repo."},
+{id:"S16",d:"Source control",diff:1,q:"What does 'Fixes AB#432' in a GitHub commit message do when Azure Boards integration is configured?",o:["Nothing","Links the commit to Azure Boards work item 432 and can transition it to done on merge","Creates a new bug","Deletes work item 432"],a:1,x:"The AB# syntax links GitHub commits/PRs to Azure Boards items; with 'Fixes' it also transitions the item when merged to the default branch. This cross-tool linking is on the exam."},
+{id:"S17",d:"Source control",diff:2,q:"Your repo has release/1.x branches receiving hotfixes. How do you ensure a fix on release/1.4 also lands in main?",o:["Hope someone remembers","Cherry-pick (or merge) the fix to main as part of the hotfix process, ideally automated in the PR flow","Re-type the code in main from memory","Lock main"],a:1,x:"Hotfix flows must define propagation to main — cherry-pick automation (or 'merge back' policy) prevents regressions where the next release loses a fix. Memory-based processes fail."},
+{id:"S18",d:"Source control",diff:3,q:"You inherit a repo where main, develop, staging, and prod branches each hold different code versions long-term, with painful merges. What is the recommended direction per modern guidance?",o:["Add more environment branches","Move toward trunk-based development: one main branch, with releases cut via tags/release branches and configuration/flags for environment differences","Merge everything monthly","Freeze all branches"],a:1,x:"Environment-per-branch causes drift and merge pain. Modern guidance: one trunk, short-lived branches, environment differences handled by config/flags/deployment rings — not divergent code lines."},
+{id:"B01",d:"Pipelines",diff:1,q:"In Azure Pipelines YAML, which trigger runs a pipeline when commits land on main?",o:["pr: branches: [main]","trigger: branches: include: [main]","schedules only","No trigger is needed"],a:1,x:"'trigger' defines CI on push; 'pr' defines pull-request validation. They're separate and commonly both configured."},
+{id:"B02",d:"Pipelines",diff:1,q:"You need Ubuntu build machines without managing any VMs. What should you use?",o:["Self-hosted agents on your laptop","Microsoft-hosted agents (e.g., ubuntu-latest)","An Azure VM you patch yourself","Docker on the production server"],a:1,x:"Microsoft-hosted agents give clean, managed VMs per run. Self-hosted is for special hardware/network/software needs and shifts patching onto you."},
+{id:"B03",d:"Pipelines",diff:2,q:"A pipeline needs to deploy to a subscription without storing any credentials/secrets in Azure DevOps. What should you configure?",o:["A PAT in a variable","Service connection using workload identity federation (OIDC)","Username/password in YAML","A shared admin account"],a:1,x:"Workload identity federation exchanges short-lived OIDC tokens for Azure access — no stored secret to leak or rotate. This is the current recommended pattern and a heavily tested topic."},
+{id:"B04",d:"Pipelines",diff:2,q:"Your build produces a versioned package other pipelines and teams consume. Where should it be published?",o:["An email attachment","Azure Artifacts (or GitHub Packages) feed","The repo's main branch","A developer's OneDrive"],a:1,x:"Package feeds give versioning, upstreams, retention, and access control for build outputs. Committing binaries to Git bloats the repo; ad-hoc sharing breaks traceability."},
+{id:"B05",d:"Pipelines",diff:1,q:"What is the purpose of an 'environment' in Azure Pipelines YAML?",o:["It renames the agent","A deployment target with history, checks, and approvals attached","It sets Node version","It's only for variables"],a:1,x:"Environments group deployment targets and carry approvals/checks and deployment history — enabling controls like 'prod requires manual approval.'"},
+{id:"B06",d:"Pipelines",diff:2,q:"You must ensure the exact binaries tested in staging are the ones deployed to production. What practice enforces this?",o:["Rebuild from the same branch for prod","Build once, then promote the same artifact through stages","Manually copy files that look the same","Rebuild with --prod flag"],a:1,x:"'Build once, deploy many' guarantees what you tested is what ships. Rebuilding — even from the same commit — can differ (dependencies, timestamps, toolchain updates) and voids your test evidence."},
+{id:"B07",d:"Pipelines",diff:2,q:"Deployment strategy: you route 5% of production traffic to the new version, watch metrics, then expand. What is this called?",o:["Blue-green deployment","Canary release","Big-bang deployment","Rolling restart"],a:1,x:"Canary releases expose a small user slice first and expand on healthy signals. Blue-green switches all traffic between two full environments at once."},
+{id:"B08",d:"Pipelines",diff:2,q:"Which deployment strategy maintains two full production environments and swaps traffic between them for instant rollback?",o:["Canary","Blue-green","Shadow","In-place upgrade"],a:1,x:"Blue-green keeps old (blue) and new (green) side by side; the router swap is fast both directions. Canary is gradual; in-place has no instant rollback."},
+{id:"B09",d:"Pipelines",diff:1,q:"In App Service, which feature lets you warm up a new version and swap it into production with near-zero downtime?",o:["FTP upload","Deployment slots with slot swap","Restarting the app","Scaling up"],a:1,x:"Deployment slots host the new version alongside production; swap exchanges them after warm-up, and swapping back is your rollback. This maps directly to blue-green on App Service."},
+{id:"B10",d:"Pipelines",diff:2,q:"A YAML pipeline should reuse identical build steps across 12 repositories with central updates. What should you use?",o:["Copy-paste YAML everywhere","Pipeline templates in a shared repository referenced via 'resources: repositories'","Classic task groups only","Wiki instructions"],a:1,x:"Shared template repos let you version and centrally update steps; consuming pipelines reference them. Copy-paste means 12 places to patch every change."},
+{id:"B11",d:"Pipelines",diff:3,q:"Security requires that production deployment steps CANNOT be altered by the same PR that triggers them. Which control addresses this?",o:["Trust reviewers to notice","Protected/required templates enforced via environment checks so prod stages must extend an approved template","Hide the YAML file","Rename the pipeline"],a:1,x:"The 'required template' check rejects runs whose pipeline doesn't extend the approved template — separating who can change deployment logic from who can trigger it. Review alone misses subtle changes."},
+{id:"B12",d:"Pipelines",diff:2,multi:true,q:"Your GitHub Actions job must not run untrusted third-party action code with access to repo secrets. Which TWO practices reduce this risk? (Choose two.)",o:["Pin actions to full commit SHAs","Use any action with many stars","Restrict/allowlist which actions may be used","Run everything as root"],a:[0,2],x:"SHA-pinning prevents tag-moving attacks on action versions, and org-level allowlists limit which external code can run at all. Star counts are not a security control."},
+{id:"B13",d:"Pipelines",diff:1,q:"Which GitHub Actions syntax defines when a workflow runs?",o:["on:","when:","trigger:","start:"],a:0,x:"'on:' declares events (push, pull_request, schedule, workflow_dispatch...). 'trigger:' is Azure Pipelines syntax — the exam tests both ecosystems, so keep them straight."},
+{id:"B14",d:"Pipelines",diff:2,q:"A nightly pipeline must run at 2 AM even with no code changes. What do you configure in Azure Pipelines YAML?",o:["trigger: none only","schedules: with cron syntax and always: true","pr: nightly","A Teams reminder"],a:1,x:"'schedules:' takes cron expressions; 'always: true' runs even without changes since the last scheduled run (default skips unchanged)."},
+{id:"B15",d:"Pipelines",diff:2,q:"Build times ballooned because npm dependencies download fresh every run. What is the standard fix?",o:["Delete package-lock.json","Pipeline caching keyed on the lockfile","Commit node_modules","Fewer builds"],a:1,x:"Cache tasks restore dependencies when the lockfile hash matches, cutting minutes per run. Committing node_modules bloats the repo and causes platform-specific breakage."},
+{id:"B16",d:"Pipelines",diff:3,q:"A release must proceed only if the Application Insights availability test for staging shows healthy for 10 minutes. Which mechanism implements this without human action?",o:["Manual approval","'Invoke Azure Monitor alerts' / query-based gates (checks) on the environment","A comment in YAML","Longer sleep step"],a:1,x:"Gates/checks can evaluate Azure Monitor alerts or queries and auto-block promotion until signals are healthy — automated quality gates are a core AZ-400 concept. Sleeps don't evaluate anything."},
+{id:"B17",d:"Pipelines",diff:1,q:"What does a 'deployment ring' strategy mean?",o:["Circular dependency in YAML","Progressively rolling out to broader user groups (e.g., canary → early adopters → everyone)","Deploying to all regions at once","A network topology"],a:1,x:"Ring-based deployment expands audiences in stages, containing blast radius — how Microsoft ships Windows and how the exam frames progressive exposure."},
+{id:"B18",d:"Pipelines",diff:2,q:"You need one pipeline to build on Linux, Windows, and macOS in parallel. What YAML feature do you use?",o:["Three separate repos","A job strategy matrix","Sequential stages only","Manual queueing three times"],a:1,x:"A matrix strategy fans one job definition across configurations (vmImage, versions), running them in parallel. It's the standard cross-platform pattern in both Azure Pipelines and GitHub Actions."},
+{id:"B19",d:"Pipelines",diff:2,q:"Variable groups in Azure Pipelines are best used for…",o:["Storing pipeline logic","Sharing configuration values (optionally Key Vault-linked) across pipelines","Source control","Replacing service connections"],a:1,x:"Variable groups centralize shared config; linking one to Key Vault surfaces secrets without storing them in DevOps. Logic belongs in templates; identity belongs in service connections."},
+{id:"B20",d:"Pipelines",diff:3,multi:true,q:"Your deployment job must run on servers inside a private network that Microsoft-hosted agents cannot reach. Options that work include… (Choose two.)",o:["Self-hosted agents inside the network","Azure-hosted agents with a public IP allowlist to private servers","Environment resources (e.g., VM resources with agents) targeting those machines","Asking the vendor to disable the firewall"],a:[0,2],x:"Self-hosted agents (or agents registered as environment VM resources) sit inside the network and reach private targets. Public-IP allowlisting Microsoft-hosted agents is brittle (huge changing ranges) and weakens the boundary."},
+{id:"B21",d:"Pipelines",diff:1,q:"Which artifact should a .NET build pipeline publish for a release pipeline to deploy?",o:["The .sln file","The compiled, packaged output (e.g., zip/NuGet) as a pipeline artifact","Random log files","The Git history"],a:1,x:"Release stages consume built artifacts. Publishing source instead would force rebuilds downstream, breaking build-once integrity."},
+{id:"B22",d:"Pipelines",diff:2,q:"A stage in YAML must wait for two earlier stages and run only if both succeed. What controls this?",o:["dependsOn with default condition","Alphabetical stage order","Random scheduling","A sleep task"],a:0,x:"'dependsOn: [StageA, StageB]' plus the default succeeded() condition gives fan-in behavior. YAML order alone doesn't define dependency."},
+{id:"B23",d:"Pipelines",diff:2,q:"You want failed production deployments to automatically roll back to the last good version. Which approach is most robust?",o:["Hope and manual redeploy","Health-check gated deployment with automated rollback step (e.g., slot swap back / redeploy previous artifact) triggered on failure","Delete the pipeline","Email the team"],a:1,x:"Automating rollback (swap-back, re-release previous artifact, 'on: failure' hooks) turns recovery into seconds. Manual recovery inflates MTTR — the metric this question is really about."},
+{id:"B24",d:"Pipelines",diff:3,q:"An approval on the 'production' environment must come from the security team, and no one may approve their own deployment. Where is this configured?",o:["In the app's code","Environment approvals and checks, with 'approvers cannot approve their own runs' enabled","README","Agent pool settings"],a:1,x:"Environment-level approvals support designated approver groups and self-approval prevention — separation-of-duties controls the exam loves. Agent pools control compute, not authorization."},
+{id:"B25",d:"Pipelines",diff:1,q:"What does CI (continuous integration) primarily require?",o:["Merging code frequently with automated build and test on every change","Deploying to prod daily","Manual QA for every commit","A release calendar"],a:0,x:"CI = frequent integration to a shared branch, validated automatically. Deployment cadence is CD's territory."},
+{id:"B26",d:"Pipelines",diff:2,q:"Feature flags are used with trunk-based development mainly to…",o:["Encrypt code","Decouple deployment from release, letting incomplete features ship dark","Speed up compilation","Replace branch policies"],a:1,x:"Flags let unfinished work merge and deploy while staying off for users — deployment (bits on servers) and release (users see it) become independent decisions."},
+{id:"B27",d:"Pipelines",diff:2,q:"Your YAML pipeline needs a secret from Azure Key Vault at runtime. Which is the recommended pattern?",o:["Paste the secret in YAML","AzureKeyVault task or Key Vault-linked variable group via a service connection","Store it in the repo's README","Hardcode in the app"],a:1,x:"Pulling from Key Vault at runtime via a service connection keeps secrets out of source and pipeline definitions, centralizing rotation and audit."},
+{id:"B28",d:"Pipelines",diff:3,q:"A multi-stage YAML pipeline deploys infrastructure with Bicep and then the app. The infra step must be idempotent. What does idempotent mean here?",o:["Runs only once ever","Re-running with the same inputs converges to the same state without errors or duplication","Requires manual cleanup","Randomized behavior"],a:1,x:"Idempotency means safe re-runs — deploying the same template twice yields the same environment. It's why declarative IaC (Bicep/Terraform) suits pipelines better than imperative scripts."},
+{id:"B29",d:"Pipelines",diff:2,q:"Which statement about self-hosted vs Microsoft-hosted agents is TRUE?",o:["Microsoft-hosted agents persist state between runs","Self-hosted agents can access private networks and custom software but you maintain them","Self-hosted agents are always more secure","Microsoft-hosted agents can reach any private network"],a:1,x:"Self-hosted trades management burden for network/software control. Hosted agents are fresh VMs each run (no persisted state) and can't reach private networks without special setup."},
+{id:"B30",d:"Pipelines",diff:2,q:"'Does this meet the goal?' — Goal: only allow production deploys of artifacts whose CI run passed all tests. Proposed: enable 'build validation' branch policy on main. Does this alone meet the goal?",o:["Yes","No — build validation gates PR merges to main; you also need the release to consume only successful CI artifacts (e.g., pipeline resource trigger on succeeded runs)","Yes, if reviewers are added","Yes, with a longer timeout"],a:1,x:"Classic exam trap: branch policy governs merging, not deployment. Deployment control needs artifact/pipeline-resource conditions or environment checks tied to CI success."},
+{id:"B31",d:"Pipelines",diff:3,q:"You must produce an SBOM (software bill of materials) for every release for compliance. Where does generation belong?",o:["Manually written quarterly","As an automated build step, published alongside the artifact","Only after an audit request","In the wiki"],a:1,x:"SBOMs must reflect each build's exact dependencies, so they're generated in the pipeline and stored with the artifact. Manual/after-the-fact SBOMs are inaccurate by definition."},
+{id:"B32",d:"Pipelines",diff:1,q:"In GitHub Actions, where do encrypted secrets get defined for a repository?",o:["In the workflow YAML in plain text","Repo Settings → Secrets and variables → Actions","In README.md","In the commit message"],a:1,x:"Secrets live in repo/org/environment settings, injected at runtime and masked in logs. Anything in YAML or the repo is not secret."},
+{id:"B33",d:"Pipelines",diff:2,q:"A pipeline intermittently fails on a flaky integration test, blocking releases. What is the BEST practice response?",o:["Delete all tests","Quarantine/flag the flaky test, fix or rewrite it, and track flakiness as tech debt — while keeping the rest of the suite blocking","Retry forever until green","Ignore all test failures"],a:1,x:"Flaky tests erode trust in CI. Quarantining preserves signal from healthy tests while forcing the flaky one to be fixed. Blanket retries hide real defects."},
+{id:"B34",d:"Pipelines",diff:2,q:"Which Azure service natively manages feature flags with targeting rules and works with App Service apps?",o:["Azure DNS","Azure App Configuration (feature manager)","Azure CDN","Azure Bastion"],a:1,x:"App Configuration's feature manager centralizes flags, percentage rollouts, and audience targeting, with SDK/App Service integration. It pairs with progressive-exposure questions on the exam."},
+{id:"B35",d:"Pipelines",diff:3,q:"Your organization requires that pipeline agents never hold long-lived cloud credentials, deployments are attributable to a pipeline identity, and access is scoped per environment. Which design satisfies all three?",o:["One PAT shared by all pipelines","Per-environment service connections using workload identity federation with RBAC scoped to each environment's resource group","A god-mode service principal with Owner on the subscription","Developer personal accounts in scripts"],a:1,x:"Federated (OIDC) per-environment connections give no stored secrets, distinct auditable identities, and least-privilege scope. Shared PATs and broad SPs violate every requirement listed."},
+{id:"C01",d:"Security",diff:1,q:"Which practice moves security testing earlier in the development lifecycle?",o:["Shift-right only","Shift-left security (scanning in PR/CI)","Annual pen test only","Prod-only monitoring"],a:1,x:"Shift-left runs SAST, dependency and secret scanning at PR/CI time, when fixes are cheapest. Later-stage testing still matters but doesn't replace early feedback."},
+{id:"C02",d:"Security",diff:1,q:"What does dependency (SCA) scanning detect?",o:["Bad variable names","Known vulnerabilities and license issues in open-source packages you consume","Slow SQL queries","UI bugs"],a:1,x:"Software composition analysis (Dependabot, GitHub Advanced Security, etc.) checks your dependency tree against vulnerability databases — most modern app risk lives in dependencies."},
+{id:"C03",d:"Security",diff:2,q:"GitHub flags a hardcoded connection string pushed to your repo. Which feature caught it, and what must you do first?",o:["Code scanning; delete the file","Secret scanning; rotate the credential immediately","Dependabot; update packages","Branch protection; add reviewers"],a:1,x:"Secret scanning detects credential patterns. The credential is compromised the moment it's pushed — rotation comes before cleanup. (Push protection can block these before they land.)"},
+{id:"C04",d:"Security",diff:2,q:"Which GitHub Advanced Security feature analyzes your own source code for vulnerabilities like SQL injection using CodeQL?",o:["Secret scanning","Code scanning","Dependabot alerts","Branch protection"],a:1,x:"Code scanning (SAST via CodeQL) finds vulnerable patterns in first-party code. Secret scanning finds credentials; Dependabot covers third-party packages — the exam tests these distinctions."},
+{id:"C05",d:"Security",diff:2,q:"Pipeline needs to pull secrets at deploy time; auditors require access logging and rotation without code changes. What should hold the secrets?",o:["Pipeline variables marked secret","Azure Key Vault with access via managed identity/service connection","A config file in the repo","Environment variables on a developer laptop"],a:1,x:"Key Vault provides rotation, RBAC, and audit logs, and apps/pipelines reference secrets at runtime so rotation needs no redeploy of code. Secret pipeline variables lack centralized rotation/audit."},
+{id:"C06",d:"Security",diff:3,q:"You must guarantee container images deployed to AKS were built by YOUR pipeline and unmodified. Which approach provides this?",o:["Use the :latest tag","Sign images in the pipeline and enforce signature/attestation verification at admission","Only pull on Fridays","Bigger images"],a:1,x:"Image signing plus admission-time verification (policy controllers checking signatures/provenance) cryptographically ties deployed images to your build. Tags are mutable and prove nothing."},
+{id:"C07",d:"Security",diff:1,q:"A managed identity is preferable to a service principal secret because…",o:["It's faster","Azure manages the credential lifecycle — nothing to store, leak, or rotate manually","It grants more permissions by default","It works offline"],a:1,x:"Managed identities eliminate the stored secret entirely; Azure handles issuance and rotation. Permission scope is still up to your RBAC assignments."},
+{id:"C08",d:"Security",diff:2,multi:true,q:"Your compliance team requires that no one can deploy to production without a second person's involvement. Which TWO controls implement this? (Choose two.)",o:["Environment approval by a different person than the requester","PR review requirement with self-approval blocked","Single admin doing everything","Verbal agreements"],a:[0,1],x:"Four-eyes enforcement lives at both change time (PR approval, no self-approval) and deploy time (environment approval excluding the requester). One privileged human is the anti-pattern being tested."},
+{id:"C09",d:"Security",diff:2,q:"Dependabot raises 40 alerts. What is the recommended triage approach?",o:["Ignore them all","Prioritize by severity/exploitability and whether the vulnerable path is reachable, automate patch PRs, and track the rest","Update everything blindly to latest majors in one PR","Disable alerts"],a:1,x:"Risk-based triage plus automated update PRs balances safety and stability. One mega-upgrade PR maximizes breakage risk; ignoring or disabling fails compliance."},
+{id:"C10",d:"Security",diff:3,multi:true,q:"Pipeline logs must never reveal secret values, including when a script accidentally echoes one. Which statements are true? (Choose two.)",o:["Secret variables are masked in logs by the platform when used properly","Masking is bulletproof no matter what scripts do","Secrets are not automatically mapped into scripts' environment unless explicitly passed (Azure Pipelines)","Printing base64 of a secret is safe"],a:[0,2],x:"Platforms mask known secret values and (in Azure Pipelines) require explicit env mapping of secrets into scripts. But transformations (base64, splitting) can evade masking — treat masking as a safety net, not a guarantee."},
+{id:"C11",d:"Security",diff:2,q:"Which Azure service gives you a central view of security posture and recommendations across your subscriptions, including DevOps security findings integration?",o:["Azure Front Door","Microsoft Defender for Cloud","Azure Traffic Manager","Azure Backup"],a:1,x:"Defender for Cloud aggregates posture management and can surface DevOps security findings (via its DevOps security capability). Networking/backup services don't do posture management."},
+{id:"C12",d:"Security",diff:2,q:"You want PRs that introduce code with known-vulnerable patterns to be blocked before merge. What do you configure?",o:["Optional weekend scans","Code scanning as a required status check on the protected branch","A suggestion in CONTRIBUTING.md","Post-deployment scanning only"],a:1,x:"Making the scan a required check turns findings into merge blockers — enforcement, not advice. Post-deploy scanning finds issues after they ship."},
+{id:"C13",d:"Security",diff:1,q:"What is the principle of least privilege in a pipeline context?",o:["Everyone gets Owner to avoid friction","Each identity gets only the permissions its specific tasks require","Only leadership has any access","No permissions for anyone"],a:1,x:"Scope each service connection/identity to exactly what its job needs (e.g., Contributor on one resource group, not the subscription). Over-permissioning turns any pipeline compromise into a broad breach."},
+{id:"C14",d:"Security",diff:3,q:"A regulated workload requires evidence that every prod change ties to an approved work item, a reviewed PR, a passing pipeline, and an approver — retrievable for audits. What is the most maintainable solution?",o:["Screenshot everything into a shared folder","Rely on the platform's linked traceability (work item ↔ PR ↔ pipeline run ↔ environment approval) and export/report from it","A word-of-mouth process","Quarterly memory-based write-ups"],a:1,x:"Azure DevOps/GitHub already chain these records; audits become queries/reports over existing links. Manual evidence collection is error-prone and doesn't scale — the exam wants tooling-native traceability."},
+{id:"I01",d:"Instrumentation",diff:1,q:"Which Azure service collects application-level telemetry like request rates, failures, and dependencies?",o:["Azure DNS","Application Insights","Azure Firewall","Azure Files"],a:1,x:"Application Insights (part of Azure Monitor) is the APM: requests, dependencies, exceptions, traces, availability. Know it cold for AZ-400."},
+{id:"I02",d:"Instrumentation",diff:1,q:"Logs in Azure Monitor Log Analytics are queried using which language?",o:["SQL","KQL (Kusto Query Language)","GraphQL","XPath"],a:1,x:"KQL is the query language across Log Analytics, Application Insights, and Sentinel. Basic KQL reading comprehension shows up on the exam."},
+{id:"I03",d:"Instrumentation",diff:2,q:"You want an alert when the 5-minute average server response time exceeds 2 seconds. What do you create?",o:["An activity log alert","A metric alert rule on the response time metric with a threshold and 5-minute aggregation","A budget alert","A DNS record"],a:1,x:"Metric alerts evaluate platform/app metrics over aggregation windows against thresholds. Activity log alerts fire on control-plane events, not performance."},
+{id:"I04",d:"Instrumentation",diff:2,q:"Users report the checkout flow is slow, but only sometimes. Which Application Insights feature shows the end-to-end timing of a single slow operation across services?",o:["Availability tests","Distributed tracing / end-to-end transaction details","Cost analysis","Service health"],a:1,x:"Distributed tracing stitches one operation across services and dependencies, exposing exactly where the time went. Availability tests probe uptime, not per-request internals."},
+{id:"I05",d:"Instrumentation",diff:2,q:"You need to know whether your public endpoint is up, from multiple regions, every 5 minutes — without writing an app. What do you use?",o:["Manual curl","Application Insights availability tests (URL ping/standard tests)","A spreadsheet","VM auto-shutdown"],a:1,x:"Availability tests probe endpoints from global points and alert on failures — synthetic monitoring out of the box."},
+{id:"I06",d:"Instrumentation",diff:3,q:"After a deployment, error rate doubles but only for one API version used by 3% of clients. Which practice would have caught this automatically during rollout?",o:["Reading logs next week","Deployment gates/auto-rollback wired to failure-rate metrics segmented by version during a canary","Bigger font in dashboards","A longer maintenance window"],a:1,x:"Canary + metric-gated promotion (watching per-version failure rates) is exactly the progressive-delivery safety net. Dashboards you look at later don't stop a bad rollout in flight."},
+{id:"I07",d:"Instrumentation",diff:2,q:"Which statement about sampling in Application Insights is TRUE?",o:["Sampling deletes all telemetry","Sampling reduces telemetry volume/cost while keeping statistically representative data","Sampling is never needed","Sampling doubles ingestion cost"],a:1,x:"Adaptive/fixed sampling keeps ingestion affordable at scale while preserving analytical validity; related items are kept together so traces stay coherent."},
+{id:"I08",d:"Instrumentation",diff:2,q:"The team wants a shared, live view of pipeline health, lead time, and failed deployments. What should you build?",o:["A monthly PDF","Azure DevOps/Azure Monitor dashboards (with widgets/queries) visible to the team","A private notebook","Nothing; use memory"],a:1,x:"Dashboards make delivery and reliability metrics ambient and shared. Static reports age instantly; hidden metrics drive no behavior."},
+{id:"I09",d:"Instrumentation",diff:3,q:"A KQL query: requests | where timestamp > ago(1h) | summarize count() by resultCode. What does it return?",o:["All request bodies","The number of requests in the last hour grouped by HTTP result code","CPU usage per VM","Nothing valid"],a:1,x:"'where' filters the time window; 'summarize count() by resultCode' aggregates request counts per status code — a quick failure-mix view. Reading small KQL snippets like this is exam-fair-game."},
+{id:"I10",d:"Instrumentation",diff:1,q:"MTTR measures…",o:["Time between releases","Mean time to restore/recover service after a failure","Number of tests","Merge frequency"],a:1,x:"MTTR is a DORA stability metric: how fast you recover. Monitoring, alerting, and automated rollback are the levers that shrink it."},
+{id:"I11",d:"Instrumentation",diff:2,q:"You want error budgets and SLOs for a service. The SLO is 99.9% successful requests over 30 days. What is the error budget?",o:["0.1% of requests over the window","10% of requests","Zero failures allowed","One outage per year"],a:0,x:"Error budget = 1 − SLO. 0.1% failed requests over 30 days is the allowance; burning it faster than planned should slow releases and trigger reliability work."},
+{id:"I12",d:"Instrumentation",diff:3,q:"Distributed tracing shows most checkout latency inside a dependency call to an external payments API, not your code. What is the correct engineering response?",o:["Rewrite your app UI","Add resilience (timeouts, retries with backoff, circuit breaker), track the dependency's SLA, and surface a dependency-level alert","Remove tracing","Blame the network team without data"],a:1,x:"When latency is a dependency, you engineer around it (resilience patterns) and alert on it. Rewriting unrelated code wastes effort; removing observability hides the problem."}
+];
+const KEY="az400-trainer", SIZE=50, PASS=700;
+const LABEL={Processes:"Processes & communication","Source control":"Source control",Pipelines:"Build & release pipelines",Security:"Security & compliance",Instrumentation:"Instrumentation & monitoring"};
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-let role = null;      // 'host' | 'player'
-let myName = '';
-let barTimer = null;
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{attempts:[],qh:{}}}catch(e){return{attempts:[],qh:{}}}}
+function save(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
+let DATA=load();
 
-ws.onclose = () => { $('landErr').innerHTML = '<div class="err">Connection lost. Refresh to reconnect.</div>'; };
+let exam=[],idx=0,sel=[],revealed=false,results=[];
 
-ws.onmessage = (e) => {
-  const m = JSON.parse(e.data);
+function buildExam(){
+  const h=DATA.qh;
+  const missed=shuffle(BANK.filter(q=>h[q.id]&&h[q.id].missed>0));
+  const unseen=shuffle(BANK.filter(q=>!h[q.id]));
+  const seenOk=shuffle(BANK.filter(q=>h[q.id]&&!(h[q.id].missed>0)));
+  const p=[];
+  for(const q of missed){if(p.length<15)p.push(q)}
+  for(const q of unseen){if(p.length<SIZE)p.push(q)}
+  for(const q of seenOk){if(p.length<SIZE)p.push(q)}
+  for(const q of missed.slice(15)){if(p.length<SIZE)p.push(q)}
+  const by=d=>shuffle(p.filter(q=>q.diff===d));
+  return [...by(1),...by(2),...by(3)];
+}
 
-  if (m.type === 'hosted') { role='host'; $('hostCode').textContent = m.code; show('s-hostlobby'); }
-  if (m.type === 'joined') { role='player'; myName=m.name; $('pCode').textContent=m.code; $('pName').textContent=m.name; show('s-playerlobby'); }
+function view(v){["v-home","v-exam","v-done"].forEach(x=>$(x).classList.toggle("hide",x!==v))}
 
-  if (m.type === 'lobby') {
-    $('hostPlayers').innerHTML = m.players.map(n=>`<span class="chip">${esc(n)}</span>`).join('');
-    $('hostCount').textContent = m.players.length ? `${m.players.length} player${m.players.length>1?'s':''} in` : 'Waiting for players…';
-  }
+function verdictOf(att){
+  const pct=att.correct/att.total;
+  const weak=Object.entries(att.dom).filter(([,s])=>s.r/s.t<0.7).map(([d,s])=>({d,pct:Math.round(100*s.r/s.t)}));
+  let v,t;
+  if(pct>=0.8&&weak.length===0){v="You're ready. Book the exam.";t="good"}
+  else if(pct>=0.7){v="Close. Pass-line territory, but tighten the weak domains before booking.";t="warn"}
+  else{v="Not yet. Focused study on the flagged domains will move you fastest.";t="bad"}
+  return{v,t,weak};
+}
 
-  if (m.type === 'question') renderQuestion(m);
-  if (m.type === 'tally') $('qLocked').classList.contains('hidden') ||
-    ($('qLocked').innerHTML = `<b>${m.answered}</b> / ${m.total} answered`);
-  if (m.type === 'locked') { $('qLocked').classList.remove('hidden'); $('qLocked').innerHTML = 'Locked in — <b>hold tight</b>'; }
-  if (m.type === 'reveal') renderReveal(m);
-  if (m.type === 'ended') renderEnd(m);
-  if (m.type === 'error') flashErr(m.msg);
+function renderHome(){
+  const last=DATA.attempts[DATA.attempts.length-1];
+  const vd=$("homeVerdict");
+  if(last){
+    const r=verdictOf(last);
+    vd.innerHTML=`<div class="banner b-${r.t}"><b>Latest verdict</b><br>${esc(r.v)}${r.weak.length?`<br><span style="color:var(--dim)">Focus: ${r.weak.map(w=>esc(LABEL[w.d])+" ("+w.pct+"%)").join(" · ")}</span>`:""}</div>`;
+  } else vd.innerHTML="";
+  const hh=$("homeHist");
+  if(DATA.attempts.length){
+    hh.innerHTML=`<div class="sect">SCORE HISTORY</div>`+
+      [...DATA.attempts].reverse().map(a=>`<div class="hist"><span class="dt">${new Date(a.date).toLocaleDateString()} · ${a.correct}/${a.total}</span><span class="${a.score>=PASS?"pass":"fail"}">${a.score}<span class="mini">${a.score>=PASS?"PASS":"FAIL"}</span></span></div>`).join("")+
+      `<button class="reset" id="resetBtn">Reset all history</button>`;
+    $("resetBtn").onclick=()=>{if(confirm("Delete all scores and question history?")){DATA={attempts:[],qh:{}};save(DATA);renderHome();}};
+  } else hh.innerHTML="";
+}
+
+function start(){
+  exam=buildExam();idx=0;results=[];
+  view("v-exam");renderQ();
+}
+
+function renderQ(){
+  const q=exam[idx];sel=[];revealed=false;
+  $("qCount").textContent=`Question ${idx+1} of ${exam.length}`;
+  $("qDom").textContent=LABEL[q.d];
+  const dv=$("qDiff");dv.textContent=q.diff===1?"Easy":q.diff===2?"Medium":"Hard";
+  dv.className="pill "+(q.diff===1?"e":q.diff===2?"m":"h");
+  $("qBar").style.width=(idx/exam.length*100)+"%";
+  $("qText").textContent=q.q;
+  $("qMulti").classList.toggle("hide",!q.multi);
+  $("qOpts").innerHTML=q.o.map((o,i)=>`<button class="opt" data-i="${i}"><span class="l">${String.fromCharCode(65+i)}.</span>${esc(o)}</button>`).join("");
+  $("qOpts").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(revealed)return;
+    const i=+b.dataset.i;
+    if(q.multi){sel=sel.includes(i)?sel.filter(x=>x!==i):[...sel,i]}
+    else sel=[i];
+    $("qOpts").querySelectorAll(".opt").forEach(x=>x.classList.toggle("sel",sel.includes(+x.dataset.i)));
+    $("submitBtn").disabled=sel.length===0;
+  });
+  $("submitBtn").disabled=true;$("submitBtn").classList.remove("hide");
+  $("qExplain").innerHTML="";$("nextBtn").classList.add("hide");
+  $("nextBtn").textContent=idx===exam.length-1?"Finish & see score":"Next question";
+}
+
+$("submitBtn").onclick=()=>{
+  const q=exam[idx];
+  const corr=q.multi?q.a:[q.a];
+  const ok=q.multi?(sel.length===corr.length&&corr.every(c=>sel.includes(c))):sel[0]===q.a;
+  results.push({id:q.id,d:q.d,ok});
+  revealed=true;
+  $("qOpts").querySelectorAll(".opt").forEach(b=>{
+    const i=+b.dataset.i;
+    b.classList.remove("sel");
+    if(corr.includes(i))b.classList.add("right");
+    else if(sel.includes(i))b.classList.add("wrong");
+    else b.classList.add("mute");
+  });
+  $("qExplain").innerHTML=`<div class="explain ${ok?"b-good":"b-bad"}" style="border-style:solid"><b>${ok?"Correct":"Incorrect"}</b>${esc(q.x)}</div>`;
+  $("submitBtn").classList.add("hide");
+  $("nextBtn").classList.remove("hide");
 };
 
-// host live tally on question screen
-ws.addEventListener('message', (e)=>{
-  const m = JSON.parse(e.data);
-  if (m.type==='tally' && role==='host'){ $('qLocked').classList.remove('hidden'); $('qLocked').innerHTML = `<b>${m.answered}</b> / ${m.total} answered`; }
-});
-
-$('hostBtn').onclick = ()=> ws.send(JSON.stringify({type:'host'}));
-$('joinBtn').onclick = ()=>{
-  const code = $('joinCode').value.trim().toUpperCase();
-  const name = $('joinName').value.trim();
-  if(code.length!==4){ return flashErr('Enter the 4-letter code.'); }
-  ws.send(JSON.stringify({type:'join', code, name}));
+$("nextBtn").onclick=()=>{
+  if(idx<exam.length-1){idx++;renderQ();return}
+  const correct=results.filter(r=>r.ok).length;
+  const score=Math.round(correct/results.length*1000);
+  const dom={};
+  for(const r of results){dom[r.d]=dom[r.d]||{r:0,t:0};dom[r.d].t++;if(r.ok)dom[r.d].r++}
+  for(const r of results){const h=DATA.qh[r.id]||{seen:0,missed:0};DATA.qh[r.id]={seen:h.seen+1,missed:h.missed+(r.ok?0:1)}}
+  const att={date:new Date().toISOString(),score,correct,total:results.length,dom};
+  DATA.attempts.push(att);save(DATA);
+  renderDone(att);view("v-done");
 };
-$('startBtn').onclick = ()=> ws.send(JSON.stringify({type:'start'}));
-$('nextBtn').onclick = ()=> ws.send(JSON.stringify({type:'next'}));
 
-function renderQuestion(m){
-  show('s-question');
-  $('qNum').textContent = `Question ${m.index+1} of ${m.total}`;
-  $('qRole').textContent = role==='host' ? 'Hosting' : '';
-  $('qText').textContent = m.q;
-  $('qLocked').classList.add('hidden');
-  const grid = $('qGrid');
-  grid.innerHTML = m.options.map((o,i)=>
-    `<button class="opt c${i}" data-i="${i}"><span class="sym">${SYM[i]}</span><span>${esc(o)}</span></button>`).join('');
-  if (role==='player'){
-    grid.querySelectorAll('.opt').forEach(b=> b.onclick = ()=>{
-      ws.send(JSON.stringify({type:'answer', choice:+b.dataset.i}));
-      grid.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');
-      b.classList.add('win');
-    });
-  } else {
-    grid.querySelectorAll('.opt').forEach(b=> b.style.pointerEvents='none');
-    $('qLocked').classList.remove('hidden'); $('qLocked').innerHTML = '<b>0</b> answered';
-  }
-  runBar(m.duration);
+function renderDone(att){
+  $("dScore").textContent=att.score;
+  $("dScore").style.color=att.score>=PASS?"var(--good)":"var(--bad)";
+  $("dDetail").textContent=`${att.correct}/${att.total} correct · pass mark ${PASS}`;
+  $("dBadge").innerHTML=`<span class="badge ${att.score>=PASS?"p":"f"}">${att.score>=PASS?"PASS":"FAIL"}</span>`;
+  const r=verdictOf(att);
+  $("dVerdict").innerHTML=`<div class="banner b-${r.t}"><b>Readiness</b><br>${esc(r.v)}${r.weak.length?`<br><span style="color:var(--dim)">Focus: ${r.weak.map(w=>esc(LABEL[w.d])+" ("+w.pct+"%)").join(" · ")}</span>`:""}</div>`;
+  $("dDomains").innerHTML=Object.entries(att.dom).map(([d,s])=>{
+    const pct=Math.round(100*s.r/s.t);
+    return `<div class="dom"><div class="row"><span>${esc(LABEL[d])}</span><span style="color:${pct>=70?"var(--good)":"var(--bad)"}">${s.r}/${s.t} · ${pct}%</span></div><div class="track"><div class="fill" style="width:${pct}%;background:${pct>=70?"var(--good)":"var(--bad)"}"></div></div></div>`;
+  }).join("");
 }
 
-function runBar(ms){
-  clearInterval(barTimer);
-  const bar = $('qBar'); const start = Date.now();
-  bar.style.width='100%';
-  barTimer = setInterval(()=>{
-    const left = Math.max(0, 1 - (Date.now()-start)/ms);
-    bar.style.width = (left*100)+'%';
-    if(left<=0) clearInterval(barTimer);
-  }, 80);
-}
-
-function renderReveal(m){
-  clearInterval(barTimer);
-  show('s-reveal');
-  const res = $('revealResult');
-  if (m.isHost){
-    res.innerHTML = `<div class="verdict ok">Answer revealed</div>
-      <p style="color:var(--dim)">Correct answer highlighted for the room.</p>`;
-    $('nextBtn').classList.remove('hidden');
-    $('nextBtn').textContent = m.last ? 'See final results' : 'Next question';
-    $('waitHost').classList.add('hidden');
-  } else {
-    res.innerHTML = m.correct
-      ? `<div class="verdict ok">Correct!</div><div class="gain" style="color:var(--ok)">+${m.gained}</div>`
-      : `<div class="verdict bad">Missed it</div><div class="gain" style="color:var(--dim)">+0</div>`;
-    $('nextBtn').classList.add('hidden');
-    $('waitHost').classList.remove('hidden');
-  }
-  renderBoard($('revealBoard'), m.scoreboard);
-}
-
-function renderBoard(el, sb){
-  el.innerHTML = sb.slice(0,8).map((p,i)=>
-    `<div class="row ${p.name===myName?'me':''}"><span class="rank">${i+1}</span><span class="nm">${esc(p.name)}</span><span class="sc">${p.score}</span></div>`).join('')
-    || '<p class="center" style="color:var(--dim)">No scores yet</p>';
-}
-
-function renderEnd(m){
-  show('s-end');
-  const top = m.scoreboard.slice(0,3);
-  const order = [top[1], top[0], top[2]]; // 2nd, 1st, 3rd
-  const medals = {0:'🥇',1:'🥈',2:'🥉'};
-  const posClass = ['p2','p1','p3'];
-  $('podium').innerHTML = order.map((p,slot)=>{
-    if(!p) return '';
-    const rank = m.scoreboard.indexOf(p);
-    return `<div class="pod ${posClass[slot]}"><div class="medal">${medals[rank]||''}</div>
-      <div class="pn">${esc(p.name)}</div><div class="ps">${p.score}</div></div>`;
-  }).join('');
-  renderBoard($('endBoard'), m.scoreboard);
-}
-
-function flashErr(msg){
-  const box = role==='host'||role==='player' ? null : $('landErr');
-  if(box){ box.innerHTML = `<div class="err">${esc(msg)}</div>`; setTimeout(()=>box.innerHTML='',4000); }
-  else alert(msg);
-}
-function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+$("startBtn").onclick=start;
+$("againBtn").onclick=start;
+$("homeBtn").onclick=()=>{renderHome();view("v-home")};
+renderHome();
 </script>
 </body>
 </html>
