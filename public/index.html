@@ -312,7 +312,9 @@ const $=id=>document.getElementById(id);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-let USER=localStorage.getItem("trainer-user")||"";
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+let USER=lsGet("trainer-user")||"";
 let STATE={};            // {certKey:{attempts:[],qh:{},prog:null}}
 let CK=null;             // active cert key
 let exam=[],idx=0,sel=[],revealed=false,results=[];
@@ -495,8 +497,9 @@ $("backHome").onclick=()=>{ setAccent("var(--az)"); renderHome(); view("v-home")
     $("nameGo").onclick=async()=>{
       const v=$("nameInput").value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,30);
       if(!v)return;
-      USER=v; localStorage.setItem("trainer-user",USER);
+      USER=v;
       $("nameModal").classList.add("hide");
+      lsSet("trainer-user",USER);
       await loadState(); renderHome();
     };
     $("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").click()});
