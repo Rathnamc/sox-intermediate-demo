@@ -2,97 +2,312 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SOX Intermediate — WebSocket Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Quiz Arcade — SOX Intermediate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,900&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --ink: #1c2733;
-    --paper: #eef2f5;
-    --card: #ffffff;
-    --accent: #0a5c8a;
-    --accent-2: #d97b2b;
+  :root{
+    --void:#151030; --panel:#211a45; --panel-2:#2c2358;
+    --ink:#f3f0ff; --dim:#a79fd0;
+    --gold:#ffd24a; --coral:#ff5d73; --teal:#33d6b8; --violet:#9a86ff;
+    --ok:#33d6b8; --bad:#ff5d73;
+    --ring:#3a2f6e;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    display: flex;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Space Grotesk",system-ui,sans-serif;
+    background:radial-gradient(120% 90% at 50% -10%, #241b52 0%, var(--void) 60%);
+    color:var(--ink); min-height:100dvh;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    overflow-x:hidden;
   }
-  .app {
-    width: 100%;
-    max-width: 460px;
-    background: var(--card);
-    border-radius: 10px;
-    box-shadow: 0 4px 18px rgba(28,39,51,.12);
-    padding: 1.5rem;
-  }
-  h1 { font-size: 1.15rem; margin: 0 0 .25rem; letter-spacing: .02em; }
-  .status { font-size: .8rem; color: #667; margin-bottom: 1rem; }
-  .status.live::before { content: "● "; color: #2a9d4a; }
-  .status.dead::before { content: "● "; color: #c0392b; }
-  .row { display: flex; gap: .5rem; margin-bottom: 1rem; }
-  input {
-    flex: 1; padding: .55rem .7rem; border: 1px solid #cdd6de;
-    border-radius: 6px; font: inherit;
-  }
-  button {
-    padding: .55rem 1rem; border: 0; border-radius: 6px;
-    background: var(--accent); color: #fff; font: inherit; cursor: pointer;
-  }
-  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
-  .tap {
-    width: 100%; padding: 1rem; font-size: 1.05rem; font-weight: 600;
-    background: var(--accent-2); margin-bottom: 1.25rem;
-  }
-  .tap:active { transform: scale(.98); }
-  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: #667; margin: 0 0 .5rem; }
-  ol { margin: 0; padding-left: 1.4rem; }
-  li { padding: .2rem 0; font-variant-numeric: tabular-nums; }
-  .round { float: right; font-size: .8rem; color: var(--accent); }
+  .stage{width:100%; max-width:760px}
+  .screen{display:none; animation:rise .35s ease}
+  .screen.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .brand{font-family:"Fraunces",serif; font-weight:900; letter-spacing:-.02em;
+    font-size:clamp(2.2rem,7vw,3.4rem); line-height:.95; text-align:center}
+  .brand em{font-style:italic; color:var(--gold)}
+  .tag{text-align:center;color:var(--dim);margin:.6rem 0 2rem;font-size:.95rem}
+
+  .card{background:linear-gradient(180deg,var(--panel),var(--void));
+    border:1px solid var(--ring); border-radius:20px; padding:1.6rem}
+  .stack{display:flex;flex-direction:column;gap:.8rem}
+
+  button{font:inherit;cursor:pointer;border:0;border-radius:14px;color:var(--ink)}
+  .big{padding:1.1rem;font-size:1.15rem;font-weight:700;
+    background:var(--gold);color:#2a1c00;box-shadow:0 6px 0 #b8942f;transition:transform .06s,box-shadow .06s}
+  .big:active{transform:translateY(4px);box-shadow:0 2px 0 #b8942f}
+  .ghost{padding:1rem;background:var(--panel-2);border:1px solid var(--ring);font-weight:600}
+  .ghost:active{transform:translateY(2px)}
+
+  input{width:100%;padding:1rem;border-radius:14px;border:1px solid var(--ring);
+    background:var(--void);color:var(--ink);font:inherit;text-align:center}
+  input.code{letter-spacing:.4em;text-transform:uppercase;font-size:1.6rem;font-weight:700;font-family:"Fraunces",serif}
+  label{font-size:.8rem;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.35rem;display:block}
+
+  /* lobby / code display */
+  .codebox{text-align:center;margin:.5rem 0 1.2rem}
+  .codebox .label{font-size:.75rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase}
+  .codebox .val{font-family:"Fraunces",serif;font-weight:900;letter-spacing:.15em;
+    font-size:clamp(3rem,14vw,5.5rem);color:var(--gold);line-height:1}
+  .players{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1rem 0}
+  .chip{background:var(--panel-2);border:1px solid var(--ring);padding:.5rem .9rem;border-radius:999px;font-weight:600;animation:rise .3s ease}
+  .count{text-align:center;color:var(--dim);font-size:.85rem}
+
+  /* question */
+  .qhead{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:.85rem;margin-bottom:.7rem}
+  .timer{height:10px;border-radius:999px;background:var(--ring);overflow:hidden;margin-bottom:1.2rem}
+  .timer > i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));width:100%;transition:width .1s linear}
+  .qtext{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(1.4rem,4.5vw,2.1rem);line-height:1.2;margin-bottom:1.4rem;text-align:center}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+  .opt{padding:1.1rem;border-radius:16px;font-weight:700;font-size:1.05rem;text-align:left;
+    display:flex;align-items:center;gap:.7rem;min-height:76px;color:#160f12;transition:transform .08s,opacity .2s,filter .2s}
+  .opt .sym{font-size:1.3rem;width:1.6rem;text-align:center;flex:none}
+  .opt:active{transform:scale(.97)}
+  .opt.c0{background:var(--coral)} .opt.c1{background:var(--teal)}
+  .opt.c2{background:var(--gold)}  .opt.c3{background:var(--violet)}
+  .opt.dim{opacity:.25;filter:grayscale(.4)}
+  .opt.win{outline:4px solid #fff;transform:scale(1.02)}
+  .locked{text-align:center;margin-top:1.3rem;color:var(--dim)}
+  .locked b{color:var(--gold)}
+
+  /* reveal / result */
+  .result{text-align:center}
+  .verdict{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2rem,9vw,3.2rem)}
+  .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+  .gain{font-size:1.3rem;font-weight:700;margin:.3rem 0 1.2rem}
+  .board{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+  .row{display:flex;align-items:center;gap:.8rem;background:var(--panel-2);border:1px solid var(--ring);border-radius:12px;padding:.7rem 1rem}
+  .row .rank{font-family:"Fraunces",serif;font-weight:900;color:var(--gold);width:1.8rem}
+  .row .nm{flex:1;font-weight:600}
+  .row .sc{font-weight:700;font-variant-numeric:tabular-nums}
+  .row.me{outline:2px solid var(--gold)}
+
+  /* podium */
+  .podium{display:flex;justify-content:center;gap:1rem;align-items:flex-end;margin:1.5rem 0}
+  .pod{background:var(--panel-2);border:1px solid var(--ring);border-radius:14px 14px 0 0;padding:1rem .8rem;text-align:center;min-width:88px}
+  .pod .medal{font-size:1.6rem}
+  .pod .pn{font-weight:700;margin:.3rem 0;font-size:.95rem}
+  .pod .ps{color:var(--gold);font-weight:700}
+  .pod.p1{height:190px} .pod.p2{height:150px} .pod.p3{height:120px}
+
+  .err{background:#3a1420;border:1px solid var(--coral);color:#ffd9df;padding:.8rem 1rem;border-radius:12px;text-align:center;margin-bottom:1rem}
+  .hidden{display:none}
+  .center{text-align:center}
+  .mt{margin-top:1.2rem}
+  a.link{color:var(--gold)}
 </style>
 </head>
 <body>
-<div class="app">
-  <h1>SOX Intermediate — Multiplayer Demo <span class="round" id="round"></span></h1>
-  <div class="status dead" id="status">Connecting…</div>
+<div class="stage">
 
-  <div class="row">
-    <input id="name" placeholder="Your name" maxlength="24" />
-    <button id="setName">Set name</button>
-  </div>
+  <!-- LANDING -->
+  <section class="screen on" id="s-landing">
+    <h1 class="brand">Quiz <em>Arcade</em></h1>
+    <p class="tag">Host on the big screen. Everyone plays from their phone.</p>
+    <div class="card stack">
+      <div id="landErr"></div>
+      <button class="big" id="hostBtn">Host a game</button>
+      <div class="center" style="color:var(--dim);margin:.4rem 0">or</div>
+      <label>Game code</label>
+      <input class="code" id="joinCode" maxlength="4" placeholder="ABCD" autocomplete="off" />
+      <label>Your name</label>
+      <input id="joinName" maxlength="20" placeholder="e.g. Chris" autocomplete="off" />
+      <button class="ghost" id="joinBtn">Join game</button>
+    </div>
+  </section>
 
-  <button class="tap" id="tap">Tap to score</button>
+  <!-- HOST LOBBY -->
+  <section class="screen" id="s-hostlobby">
+    <div class="card">
+      <div class="codebox">
+        <div class="label">Join at this site with code</div>
+        <div class="val" id="hostCode">----</div>
+      </div>
+      <div class="count" id="hostCount">Waiting for players…</div>
+      <div class="players" id="hostPlayers"></div>
+      <button class="big mt" id="startBtn" style="width:100%">Start game</button>
+    </div>
+  </section>
 
-  <h2>Live scoreboard</h2>
-  <ol id="board"></ol>
+  <!-- PLAYER LOBBY -->
+  <section class="screen" id="s-playerlobby">
+    <div class="card center">
+      <div class="codebox">
+        <div class="label">You're in — room</div>
+        <div class="val" id="pCode">----</div>
+      </div>
+      <p style="color:var(--dim)">Hang tight, <b id="pName" style="color:var(--ink)"></b>. The host starts the game.</p>
+    </div>
+  </section>
+
+  <!-- QUESTION -->
+  <section class="screen" id="s-question">
+    <div class="card">
+      <div class="qhead"><span id="qNum">Question</span><span id="qRole"></span></div>
+      <div class="timer"><i id="qBar"></i></div>
+      <div class="qtext" id="qText"></div>
+      <div class="grid" id="qGrid"></div>
+      <div class="locked hidden" id="qLocked"></div>
+    </div>
+  </section>
+
+  <!-- REVEAL -->
+  <section class="screen" id="s-reveal">
+    <div class="card">
+      <div class="result" id="revealResult"></div>
+      <div class="board" id="revealBoard"></div>
+      <button class="big mt hidden" id="nextBtn" style="width:100%">Next question</button>
+      <p class="center mt hidden" id="waitHost" style="color:var(--dim)">Waiting for host…</p>
+    </div>
+  </section>
+
+  <!-- END -->
+  <section class="screen" id="s-end">
+    <div class="card center">
+      <h2 class="brand" style="font-size:2rem">Final results</h2>
+      <div class="podium" id="podium"></div>
+      <div class="board" id="endBoard"></div>
+      <button class="ghost mt" onclick="location.reload()" style="width:100%">Play again</button>
+    </div>
+  </section>
+
 </div>
 
 <script>
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  const ws = new WebSocket(`${proto}://${location.host}`);
-  const $ = id => document.getElementById(id);
+const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+const ws = new WebSocket(`${proto}://${location.host}`);
+const $ = id => document.getElementById(id);
+const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); };
+const SYM = ['▲','●','■','◆'];
 
-  ws.onopen = () => { $('status').textContent = 'Connected'; $('status').className = 'status live'; };
-  ws.onclose = () => { $('status').textContent = 'Disconnected — refresh to rejoin'; $('status').className = 'status dead'; };
+let role = null;      // 'host' | 'player'
+let myName = '';
+let barTimer = null;
 
-  ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-    if (msg.type === 'welcome') $('name').value = msg.you;
-    if (msg.type === 'state') {
-      $('round').textContent = 'Round ' + msg.round;
-      $('board').innerHTML = msg.scoreboard
-        .map(p => `<li>${p.name.replace(/</g,'&lt;')} — ${p.score}</li>`).join('');
-    }
-  };
+ws.onclose = () => { $('landErr').innerHTML = '<div class="err">Connection lost. Refresh to reconnect.</div>'; };
 
-  $('tap').onclick = () => ws.send(JSON.stringify({ type: 'tap' }));
-  $('setName').onclick = () => ws.send(JSON.stringify({ type: 'setName', name: $('name').value }));
+ws.onmessage = (e) => {
+  const m = JSON.parse(e.data);
+
+  if (m.type === 'hosted') { role='host'; $('hostCode').textContent = m.code; show('s-hostlobby'); }
+  if (m.type === 'joined') { role='player'; myName=m.name; $('pCode').textContent=m.code; $('pName').textContent=m.name; show('s-playerlobby'); }
+
+  if (m.type === 'lobby') {
+    $('hostPlayers').innerHTML = m.players.map(n=>`<span class="chip">${esc(n)}</span>`).join('');
+    $('hostCount').textContent = m.players.length ? `${m.players.length} player${m.players.length>1?'s':''} in` : 'Waiting for players…';
+  }
+
+  if (m.type === 'question') renderQuestion(m);
+  if (m.type === 'tally') $('qLocked').classList.contains('hidden') ||
+    ($('qLocked').innerHTML = `<b>${m.answered}</b> / ${m.total} answered`);
+  if (m.type === 'locked') { $('qLocked').classList.remove('hidden'); $('qLocked').innerHTML = 'Locked in — <b>hold tight</b>'; }
+  if (m.type === 'reveal') renderReveal(m);
+  if (m.type === 'ended') renderEnd(m);
+  if (m.type === 'error') flashErr(m.msg);
+};
+
+// host live tally on question screen
+ws.addEventListener('message', (e)=>{
+  const m = JSON.parse(e.data);
+  if (m.type==='tally' && role==='host'){ $('qLocked').classList.remove('hidden'); $('qLocked').innerHTML = `<b>${m.answered}</b> / ${m.total} answered`; }
+});
+
+$('hostBtn').onclick = ()=> ws.send(JSON.stringify({type:'host'}));
+$('joinBtn').onclick = ()=>{
+  const code = $('joinCode').value.trim().toUpperCase();
+  const name = $('joinName').value.trim();
+  if(code.length!==4){ return flashErr('Enter the 4-letter code.'); }
+  ws.send(JSON.stringify({type:'join', code, name}));
+};
+$('startBtn').onclick = ()=> ws.send(JSON.stringify({type:'start'}));
+$('nextBtn').onclick = ()=> ws.send(JSON.stringify({type:'next'}));
+
+function renderQuestion(m){
+  show('s-question');
+  $('qNum').textContent = `Question ${m.index+1} of ${m.total}`;
+  $('qRole').textContent = role==='host' ? 'Hosting' : '';
+  $('qText').textContent = m.q;
+  $('qLocked').classList.add('hidden');
+  const grid = $('qGrid');
+  grid.innerHTML = m.options.map((o,i)=>
+    `<button class="opt c${i}" data-i="${i}"><span class="sym">${SYM[i]}</span><span>${esc(o)}</span></button>`).join('');
+  if (role==='player'){
+    grid.querySelectorAll('.opt').forEach(b=> b.onclick = ()=>{
+      ws.send(JSON.stringify({type:'answer', choice:+b.dataset.i}));
+      grid.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');
+      b.classList.add('win');
+    });
+  } else {
+    grid.querySelectorAll('.opt').forEach(b=> b.style.pointerEvents='none');
+    $('qLocked').classList.remove('hidden'); $('qLocked').innerHTML = '<b>0</b> answered';
+  }
+  runBar(m.duration);
+}
+
+function runBar(ms){
+  clearInterval(barTimer);
+  const bar = $('qBar'); const start = Date.now();
+  bar.style.width='100%';
+  barTimer = setInterval(()=>{
+    const left = Math.max(0, 1 - (Date.now()-start)/ms);
+    bar.style.width = (left*100)+'%';
+    if(left<=0) clearInterval(barTimer);
+  }, 80);
+}
+
+function renderReveal(m){
+  clearInterval(barTimer);
+  show('s-reveal');
+  const res = $('revealResult');
+  if (m.isHost){
+    res.innerHTML = `<div class="verdict ok">Answer revealed</div>
+      <p style="color:var(--dim)">Correct answer highlighted for the room.</p>`;
+    $('nextBtn').classList.remove('hidden');
+    $('nextBtn').textContent = m.last ? 'See final results' : 'Next question';
+    $('waitHost').classList.add('hidden');
+  } else {
+    res.innerHTML = m.correct
+      ? `<div class="verdict ok">Correct!</div><div class="gain" style="color:var(--ok)">+${m.gained}</div>`
+      : `<div class="verdict bad">Missed it</div><div class="gain" style="color:var(--dim)">+0</div>`;
+    $('nextBtn').classList.add('hidden');
+    $('waitHost').classList.remove('hidden');
+  }
+  renderBoard($('revealBoard'), m.scoreboard);
+}
+
+function renderBoard(el, sb){
+  el.innerHTML = sb.slice(0,8).map((p,i)=>
+    `<div class="row ${p.name===myName?'me':''}"><span class="rank">${i+1}</span><span class="nm">${esc(p.name)}</span><span class="sc">${p.score}</span></div>`).join('')
+    || '<p class="center" style="color:var(--dim)">No scores yet</p>';
+}
+
+function renderEnd(m){
+  show('s-end');
+  const top = m.scoreboard.slice(0,3);
+  const order = [top[1], top[0], top[2]]; // 2nd, 1st, 3rd
+  const medals = {0:'🥇',1:'🥈',2:'🥉'};
+  const posClass = ['p2','p1','p3'];
+  $('podium').innerHTML = order.map((p,slot)=>{
+    if(!p) return '';
+    const rank = m.scoreboard.indexOf(p);
+    return `<div class="pod ${posClass[slot]}"><div class="medal">${medals[rank]||''}</div>
+      <div class="pn">${esc(p.name)}</div><div class="ps">${p.score}</div></div>`;
+  }).join('');
+  renderBoard($('endBoard'), m.scoreboard);
+}
+
+function flashErr(msg){
+  const box = role==='host'||role==='player' ? null : $('landErr');
+  if(box){ box.innerHTML = `<div class="err">${esc(msg)}</div>`; setTimeout(()=>box.innerHTML='',4000); }
+  else alert(msg);
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 </script>
 </body>
 </html>
