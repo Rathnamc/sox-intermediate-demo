@@ -494,15 +494,18 @@ $("backHome").onclick=()=>{ setAccent("var(--az)"); renderHome(); view("v-home")
 (async function(){
   if(!USER){
     $("nameModal").classList.remove("hide");
-    $("nameGo").onclick=async()=>{
-      const v=$("nameInput").value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,30);
+    const goName=async()=>{
+      const inp=document.getElementById("nameInput");
+      const v=(inp?inp.value:"").trim().toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,30);
       if(!v)return;
       USER=v;
       $("nameModal").classList.add("hide");
       lsSet("trainer-user",USER);
       await loadState(); renderHome();
     };
-    $("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").click()});
+    // Delegated listeners: survive extensions replacing DOM nodes.
+    document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("#nameGo")) goName(); },true);
+    document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target&&e.target.id==="nameInput") goName(); },true);
   } else {
     await loadState(); renderHome();
   }
