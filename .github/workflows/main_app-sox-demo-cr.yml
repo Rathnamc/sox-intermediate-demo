@@ -52,4 +52,4 @@ jobs:
           app-name: 'app-sox-demo-cr'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_67C15F5EDE93413F8E370ABB2C01875A }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4516BFC614EF4FFF84167CD28D78626F }}
