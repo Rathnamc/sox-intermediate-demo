@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Click Test</title>
+<style>body{font-family:system-ui;background:#111;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px}
+button{font-size:1.4rem;padding:16px 40px;border-radius:12px;border:0;background:#38a3f5;color:#04121f;font-weight:700;cursor:pointer}
+#n{font-size:3rem;font-weight:700}#api{color:#8a97b6}</style></head>
+<body>
+<div id="n">0</div>
+<button id="b">Click me</button>
+<div id="api">checking API…</div>
+<script>
+var c=0;
+document.getElementById('b').onclick=function(){c++;document.getElementById('n').textContent=c;};
+fetch('/health').then(r=>r.json()).then(j=>{document.getElementById('api').textContent='API ok · storage: '+j.storage;}).catch(e=>{document.getElementById('api').textContent='API failed: '+e.message;});
+</script>
+</body></html>
