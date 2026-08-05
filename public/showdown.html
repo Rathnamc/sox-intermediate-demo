@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DevOps Showdown — AWS DOP-C02</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0f1220;--tile:#191e3a;--tile-used:#12162b;--edge:#262e57;--ink:#f2f4ff;--dim:#8d97c0;
+--amber:#ff9a3c;--cyan:#4de1ff;--good:#2fd08f;--bad:#ff5d73}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
+h1{font-family:"Unbounded",sans-serif;font-weight:900;font-size:clamp(1.4rem,4vw,2.2rem);letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--amber)}
+.sub{color:var(--dim);font-size:.85rem;margin:6px 0 20px;text-align:center}
+.hide{display:none!important}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;color:var(--ink)}
+.primary{background:var(--amber);color:#221200;font-weight:700;padding:13px 26px;font-size:1rem}
+.ghost{background:var(--tile);border:1px solid var(--edge);padding:11px 20px;font-weight:600}
+
+/* setup */
+.setup{max-width:420px;width:100%;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:22px}
+.setup label{display:block;font-size:.72rem;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;margin:14px 0 6px}
+.setup input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);font:inherit}
+.count{display:flex;gap:8px}
+.count button{flex:1;padding:10px;background:var(--bg);border:1px solid var(--edge)}
+.count button.on{border-color:var(--amber);color:var(--amber);font-weight:700}
+
+/* board */
+.board{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;width:100%;max-width:1060px}
+.cat{background:var(--tile);border:1px solid var(--edge);border-radius:10px;padding:10px 6px;text-align:center;
+font-family:"Unbounded",sans-serif;font-weight:700;font-size:clamp(.55rem,1.4vw,.8rem);color:var(--cyan);
+display:flex;align-items:center;justify-content:center;min-height:64px;line-height:1.25}
+.cell{position:relative;perspective:600px;min-height:58px}
+.cell button{width:100%;height:100%;background:var(--tile);border:1px solid var(--edge);border-radius:10px;
+font-family:"Unbounded",sans-serif;font-weight:900;font-size:clamp(.9rem,2.4vw,1.4rem);color:var(--amber);
+transition:transform .35s,opacity .3s;transform-style:preserve-3d}
+.cell button:hover{border-color:var(--amber)}
+.cell.used button{transform:rotateX(180deg);opacity:.18;pointer-events:none}
+
+/* players strip */
+.players{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:18px 0 6px;width:100%;max-width:1060px}
+.pl{background:var(--tile);border:1px solid var(--edge);border-radius:12px;padding:9px 16px;min-width:130px;text-align:center}
+.pl .nm{font-size:.8rem;color:var(--dim)}
+.pl .sc{font-family:"Unbounded",sans-serif;font-weight:700;font-size:1.15rem}
+.pl .sc.neg{color:var(--bad)}
+.pl.turn{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
+.pl.turn .nm{color:var(--amber)}
+.turnnote{color:var(--dim);font-size:.8rem;margin-bottom:14px}
+.turnnote b{color:var(--ink)}
+
+/* clue overlay */
+.overlay{position:fixed;inset:0;background:#0f1220f2;display:flex;align-items:center;justify-content:center;padding:20px;z-index:9;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.clue{width:100%;max-width:640px;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:24px}
+.clue .tag{display:flex;justify-content:space-between;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+.clue .tag .val{color:var(--amber);font-family:"Unbounded",sans-serif;font-weight:900;font-size:1rem;letter-spacing:0}
+.clue .q{font-size:clamp(1rem,2.4vw,1.25rem);font-weight:600;line-height:1.5;margin-bottom:16px}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--edge);border-radius:11px;padding:12px 14px;margin-bottom:8px;font-size:.92rem;line-height:1.4}
+.opt:hover{border-color:var(--cyan)}
+.opt .l{color:var(--dim);font-family:monospace;margin-right:8px}
+.opt.right{border-color:var(--good);background:#0c261c}
+.opt.wrong{border-color:var(--bad);background:#2a1018}
+.opt.mute{opacity:.45}
+.verdict{border-radius:12px;border:1px solid;padding:12px 14px;margin-top:12px;font-size:.9rem;line-height:1.5}
+.verdict.g{border-color:#1d6b4c;background:#0c261c}
+.verdict.b{border-color:#7a2634;background:#2a1018}
+.clue .next{margin-top:14px;width:100%}
+
+/* finale */
+.finale{max-width:520px;width:100%;text-align:center;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:26px}
+.finale .win{font-family:"Unbounded",sans-serif;font-weight:900;font-size:1.6rem;color:var(--amber);margin:8px 0 18px}
+.frow{display:flex;justify-content:space-between;background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:10px 16px;margin-bottom:8px}
+.frow .fs{font-family:"Unbounded",sans-serif;font-weight:700}
+</style>
+</head>
+<body>
+<h1>DevOps <em>Showdown</em></h1>
+<p class="sub">AWS DevOps Professional (DOP-C02) · pick a tile · right answer wins the points, wrong answer loses them · answer right, keep control</p>
+
+<!-- SETUP -->
+<div class="setup" id="setup">
+  <label>How many players?</label>
+  <div class="count" id="pcount">
+    <button data-n="1">1</button><button data-n="2" class="on">2</button><button data-n="3">3</button><button data-n="4">4</button>
+  </div>
+  <div id="nameFields"></div>
+  <button class="primary" id="startBtn" style="width:100%;margin-top:20px">Start game</button>
+</div>
+
+<!-- GAME -->
+<div id="game" class="hide" style="width:100%;display:flex;flex-direction:column;align-items:center">
+  <div class="players" id="playersBar"></div>
+  <p class="turnnote">Board control: <b id="turnName"></b> — pick a tile</p>
+  <div class="board" id="board"></div>
+</div>
+
+<!-- FINALE -->
+<div class="finale hide" id="finale">
+  <p class="sub" style="margin:0">Final scores</p>
+  <div class="win" id="winner"></div>
+  <div id="frows"></div>
+  <button class="primary" style="margin-top:14px" onclick="location.reload()">Play again</button>
+</div>
+
+<div id="overlayRoot"></div>
+
+<script>
+// ---- 6 categories x 5 values, original DOP-C02 questions ----
+const CATS = [
+{name:"Pipelines & Ships", qs:[
+ {v:200,q:"This AWS service reads a buildspec.yml and runs your build and test commands on managed containers.",o:["CodeDeploy","CodeBuild","EventBridge","Athena"],a:1,x:"CodeBuild owns the build phases; CodeDeploy only handles getting artifacts onto targets."},
+ {v:400,q:"In a CodeDeploy blue/green ECS deployment, this file defines the task set and lifecycle hooks.",o:["buildspec.yml","Dockerfile","appspec.yml","samconfig.toml"],a:2,x:"appspec.yml is CodeDeploy's contract — the buildspec/appspec distinction is a favorite exam trap."},
+ {v:600,q:"To shift 10% of Lambda traffic to a new version and hold for 10 minutes before full cutover, you'd pick this deployment configuration.",o:["AllAtOnce","Canary10Percent10Minutes","Linear10PercentEvery10Minutes only","BlueGreenHalf"],a:1,x:"Canary configs do one small shift, hold, then complete; Linear steps gradually the whole way."},
+ {v:800,q:"A monorepo keeps triggering every service's pipeline on each commit. The cost-sane fix is this.",o:["Run pipelines hourly","Path-based trigger filtering so only changed services build","Delete half the services","Bigger build instances"],a:1,x:"Trigger filters on paths start only affected pipelines — same monorepo answer on every platform."},
+ {v:1000,q:"To guarantee only pipeline-built artifacts reach prod, restrict the artifact bucket's reads AND deploy rights to these.",o:["All developers for speed","The pipeline's IAM role(s) only","The root user","Any principal in the org"],a:1,x:"Provenance is enforced with IAM: only the pipeline role can read artifacts and assume the prod deploy role."}]},
+{name:"Everything as Code", qs:[
+ {v:200,q:"When a CloudFormation stack update fails, this happens by default.",o:["Resources stay half-updated","Automatic rollback to last good state","Stack deletes itself","Nothing"],a:1,x:"Failed updates roll back automatically — a core CloudFormation safety default."},
+ {v:400,q:"To preview exactly what a stack update will add, modify, or destroy before running it, create one of these.",o:["A change set","A drift report","A stack policy","A snapshot"],a:0,x:"Change sets are CloudFormation's 'plan' step — review resource actions before executing."},
+ {v:600,q:"Someone hand-edited a security group that CloudFormation manages. This feature catches the divergence.",o:["cfn-lint","Drift detection","Rollback triggers","Stack notifications"],a:1,x:"Drift detection compares live state to the template's expected state."},
+ {v:800,q:"Deploying a baseline stack to every account in an Organization — including future ones — automatically calls for this.",o:["Copy-paste per account","StackSets with service-managed permissions and auto-deployment","One mega-stack","An email policy"],a:1,x:"Org-integrated StackSets auto-deploy to accounts joining a target OU."},
+ {v:1000,q:"A Lambda-backed custom resource hangs stack deletes for an hour when it errors. The design flaw is failing to do this.",o:["Use YAML","Always send a response to the callback URL, even on failure","Add more memory","Tag the function"],a:1,x:"Custom resources must respond success OR failure to CloudFormation's pre-signed URL; wrappers like crhelper guarantee it."}]},
+{name:"Built to Survive", qs:[
+ {v:200,q:"Surviving an AZ outage with zero manual action starts with an Auto Scaling group spread across AZs behind this.",o:["A load balancer","A NAT gateway","CloudFront only","A bastion host"],a:0,x:"ELB routes around failed instances/AZs while the ASG replaces capacity — baseline multi-AZ."},
+ {v:400,q:"Messages that fail processing repeatedly should land in one of these instead of poisoning the queue.",o:["A FIFO queue","A dead-letter queue","An S3 bucket","A bigger queue"],a:1,x:"Redrive policy + maxReceiveCount moves poison messages to a DLQ; alarm on its depth."},
+ {v:600,q:"Cross-region DR with minutes-level RTO and near-zero RPO at reasonable cost is this strategy.",o:["Backup & restore","Pilot light with no data replication","Warm standby with continuous replication","Multi-site active-active always"],a:2,x:"Warm standby keeps replicated data plus scaled-down capacity ready to scale up — the classic RTO/RPO match question."},
+ {v:800,q:"Route 53 stops sending traffic to a failing regional endpoint when records are paired with these.",o:["Health checks","MX records","Longer TTLs","Alias-only records"],a:0,x:"Health checks mark endpoints unhealthy so failover/latency/weighted policies exclude them."},
+ {v:1000,q:"A standby region's Lambdas read config from a DynamoDB table that exists only in the primary region. The fix is this.",o:["Nothing, it's fine","Global tables so the standby is self-contained","Bigger Lambdas","A faster VPN"],a:1,x:"DR regions must work independently — any synchronous dependency on the primary fails with it."}]},
+{name:"Watch & Learn", qs:[
+ {v:200,q:"Application logs from EC2 and containers are centralized in this service first.",o:["S3 Glacier","CloudWatch Logs","Route 53","EBS"],a:1,x:"CloudWatch Logs gives retention, metric filters, subscriptions, and Logs Insights queries."},
+ {v:400,q:"Turning 'ERROR' lines in a log group into something you can alarm on takes one of these.",o:["A metric filter","A dashboard","An S3 lifecycle rule","A tag"],a:0,x:"Metric filters publish custom metrics from matching log events; alarms act on the metric."},
+ {v:600,q:"To trace one slow request across microservices and see where the time went, use this.",o:["AWS X-Ray","Trusted Advisor","AWS Config","Cost Explorer"],a:0,x:"X-Ray is the distributed tracing service — service maps plus per-segment timing."},
+ {v:800,q:"An alert should fire only when high latency AND elevated 5xx happen together. Natively, that's one of these.",o:["Two emails","A composite alarm","A longer period","A dashboard annotation"],a:1,x:"Composite alarms evaluate boolean logic over child alarm states — purpose-built noise reduction."},
+ {v:1000,q:"Scripted multi-step user flows (login → cart → checkout) probed every 5 minutes come from this CloudWatch feature.",o:["Contributor Insights","Synthetics canaries","Metric math","ServiceLens only"],a:1,x:"Synthetics canaries run scripted browser/API checks on schedules and emit alarmable metrics."}]},
+{name:"3 AM Pages", qs:[
+ {v:200,q:"Alarm notifications reach email, SMS, and chat by publishing to this.",o:["An SNS topic","An SQS queue","A Kinesis stream","An EFS mount"],a:0,x:"Alarms publish to SNS; subscriptions fan out, including AWS Chatbot for Slack/Teams."},
+ {v:400,q:"When GuardDuty flags cryptomining, the automated quarantine flow starts with a rule in this service.",o:["EventBridge","Direct Connect","AppSync","Amplify"],a:0,x:"Findings flow through EventBridge; rules invoke Lambda/SSM remediation and notifications."},
+ {v:600,q:"Multi-step operational procedures with parameters, approvals, and an audit trail live here.",o:["A wiki","SSM Automation runbooks","Sticky notes","EC2 user data"],a:1,x:"Systems Manager Automation is runbooks-as-code with execution history."},
+ {v:800,q:"Reconstructing exactly who changed a security group last Tuesday means querying this.",o:["CloudWatch metrics","CloudTrail","VPC flow logs only","The EC2 console"],a:1,x:"CloudTrail records control-plane API calls — who, what, when, from where."},
+ {v:1000,q:"An SQS worker fleet should recover from backlog automatically by scaling on this metric shape.",o:["CPU only","Backlog per instance (queue depth ÷ fleet size) target tracking","Disk IOPS","Time of day"],a:1,x:"Backlog-per-worker target tracking is the canonical SQS scaling pattern — tested before the incident, not during."}]},
+{name:"Lock It Down", qs:[
+ {v:200,q:"An EC2 app calling S3 should get its credentials from this — never from keys on disk.",o:["An instance profile (IAM role)","The root user","A config file","Hardcoded env vars"],a:0,x:"Instance roles deliver auto-rotated temporary credentials via the metadata service."},
+ {v:400,q:"Continuously checking resources against rules like 'EBS volumes must be encrypted' is this service's job.",o:["AWS Config","CloudFront","SES","Glue"],a:0,x:"Config records configuration timelines and evaluates compliance rules, with optional auto-remediation."},
+ {v:600,q:"Preventing ANY member account — even its admins — from disabling CloudTrail takes one of these.",o:["A strong password","A Service Control Policy","A tooltip","An IAM user policy"],a:1,x:"SCPs are org-level guardrails that bound what even account administrators can do."},
+ {v:800,q:"Secrets that must rotate every 30 days without redeploying apps belong in this service.",o:["Plain SSM String parameters","Secrets Manager with rotation","A private repo","An AMI"],a:1,x:"Secrets Manager schedules rotation Lambdas; apps fetch at runtime so rotation needs no redeploy."},
+ {v:1000,q:"Blocking templates that grant iam:* before they ever deploy is done with policy-as-code here.",o:["After deployment in prod","As a failing pipeline stage (cfn-guard / OPA)","In a quarterly review","In users' memories"],a:1,x:"Template scanning in the pipeline fails fast pre-deploy — codified security review beats detection after the risk exists."}]}
+];
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let players=[],turn=0,used=0,total=30,doubleCell=null;
+
+// ---- setup ----
+let pcount=2;
+function renderNames(){
+  $("nameFields").innerHTML=Array.from({length:pcount},(_,i)=>
+    `<label>Player ${i+1} name</label><input maxlength="16" id="pn${i}" placeholder="Player ${i+1}"/>`).join("");
+}
+document.addEventListener("click",e=>{
+  const cb=e.target.closest&&e.target.closest("#pcount button");
+  if(cb){pcount=+cb.dataset.n;document.querySelectorAll("#pcount button").forEach(b=>b.classList.toggle("on",b===cb));renderNames();}
+});
+renderNames();
+
+document.addEventListener("click",e=>{
+  if(!(e.target.closest&&e.target.closest("#startBtn")))return;
+  players=Array.from({length:pcount},(_,i)=>({name:($("pn"+i).value.trim()||("Player "+(i+1))).slice(0,16),score:0}));
+  turn=0;used=0;
+  // one hidden Double Down tile
+  doubleCell=[Math.floor(Math.random()*6),Math.floor(Math.random()*5)].join("-");
+  $("setup").classList.add("hide");$("game").classList.remove("hide");
+  renderBoard();renderPlayers();
+});
+
+// ---- board ----
+function renderBoard(){
+  const b=$("board");
+  b.innerHTML=CATS.map(c=>`<div class="cat">${esc(c.name)}</div>`).join("")+
+    CATS[0].qs.map((_,row)=>CATS.map((c,col)=>
+      `<div class="cell" id="cell-${col}-${row}"><button data-col="${col}" data-row="${row}">${c.qs[row].v}</button></div>`
+    ).join("")).join("");
+}
+function renderPlayers(){
+  $("playersBar").innerHTML=players.map((p,i)=>
+    `<div class="pl ${i===turn?"turn":""}"><div class="nm">${esc(p.name)}</div><div class="sc ${p.score<0?"neg":""}">${p.score}</div></div>`).join("");
+  $("turnName").textContent=players[turn].name;
+}
+
+// ---- clue flow ----
+let active=null; // {col,row,q,value,answered}
+document.addEventListener("click",e=>{
+  const t=e.target.closest&&e.target.closest(".cell button");
+  if(!t||active)return;
+  const col=+t.dataset.col,row=+t.dataset.row;
+  const q=CATS[col].qs[row];
+  const isDouble=(col+"-"+row)===doubleCell;
+  active={col,row,q,value:isDouble?q.v*2:q.v,answered:false,dbl:isDouble};
+  const root=$("overlayRoot");
+  root.innerHTML=`<div class="overlay"><div class="clue">
+    <div class="tag"><span>${esc(CATS[col].name)}${isDouble?' · <b style="color:var(--amber)">DOUBLE DOWN ×2</b>':''}</span><span class="val">${active.value}</span></div>
+    <div class="q">${esc(q.q)}</div>
+    ${q.o.map((o,i)=>`<button class="opt" data-i="${i}"><span class="l">${String.fromCharCode(65+i)}.</span>${esc(o)}</button>`).join("")}
+    <div id="clueVerdict"></div>
+  </div></div>`;
+});
+
+document.addEventListener("click",e=>{
+  const o=e.target.closest&&e.target.closest(".opt");
+  if(!o||!active||active.answered)return;
+  active.answered=true;
+  const i=+o.dataset.i,q=active.q,ok=i===q.a;
+  document.querySelectorAll(".opt").forEach(b=>{
+    const bi=+b.dataset.i;
+    if(bi===q.a)b.classList.add("right");
+    else if(bi===i)b.classList.add("wrong");
+    else b.classList.add("mute");
+  });
+  const p=players[turn];
+  p.score+=ok?active.value:-active.value;
+  $("clueVerdict").innerHTML=`<div class="verdict ${ok?"g":"b"}"><b>${ok?esc(p.name)+" takes "+active.value+"!":esc(p.name)+" drops "+active.value+"."}</b><br>${esc(q.x)}</div>
+    <button class="primary next" id="clueNext">${used+1>=total?"Final scores":"Back to the board"}</button>`;
+  if(!ok) turn=(turn+1)%players.length;   // wrong answer passes control
+  renderPlayers();
+});
+
+document.addEventListener("click",e=>{
+  if(!(e.target.closest&&e.target.closest("#clueNext")))return;
+  $("cell-"+active.col+"-"+active.row).classList.add("used");
+  $("overlayRoot").innerHTML="";
+  active=null;used++;
+  if(used>=total)finale();
+});
+
+function finale(){
+  $("game").classList.add("hide");
+  const sorted=[...players].sort((a,b)=>b.score-a.score);
+  $("winner").textContent=sorted.length>1&&sorted[0].score===sorted[1].score?"It's a tie!":sorted[0].name+" wins!";
+  $("frows").innerHTML=sorted.map(p=>`<div class="frow"><span>${esc(p.name)}</span><span class="fs">${p.score}</span></div>`).join("");
+  $("finale").classList.remove("hide");
+}
+</script>
+</body>
+</html>
